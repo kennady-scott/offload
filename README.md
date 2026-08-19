@@ -16,8 +16,8 @@ Static HTML. No build step.
 
 ## Tools
 
-**Right now:** Say This · Get Them Back · Bellringers · Before the Bell · Home Note · Sub Day
-**Get something done:** Adapt It · Catch Me Up · Tiny Crap · Plot Ruckus
+**Right now:** Say This · Get Them Back · Bellringers *(start of class)* · Before the Bell *(end of class)* · Home Note · Sub Day
+**Get something done:** Adapt It · Catch Me Up · Tiny Things · Plot Ruckus (opens plotruckus.com)
 
 Each tool stays a free standalone site; the hub is what makes them all know the teacher's
 classes, students, and routines.
