@@ -1,0 +1,33 @@
+/* ══ Offload design tokens — shared by index.html (marketing) + app.html (signed-in) ══ */
+:root{
+  /* surfaces — WHITE base, no cream */
+  --cream:#FFFFFF;          /* page background (name kept for compatibility) */
+  --cream-deep:#F7F8FA;     /* faint zone / alternating band */
+  --paper:#FFFFFF;          /* card surface */
+
+  /* ink */
+  --ink:#14213D;
+  --ink-2:#3C4C6B;
+  --ink-3:#7B87A0;
+
+  /* accents */
+  --pink:#F76A8C;
+  --pink-soft:#FFE1EA;
+  --yellow:#FFD44D;
+  --yellow-soft:#FFF0C2;
+  --blue:#3567E8;
+  --blue-soft:#DCEAFF;
+  --mint:#DCF2E3;
+  --green:#3E9A6A;
+  --lilac:#E9E2FF;
+  --purple:#7B5BD6;
+  --peach:#FFE2D0;
+  --orange:#E8763A;
+
+  /* lines + shadow */
+  --line:rgba(20,33,61,.13);
+  --line-2:rgba(20,33,61,.07);
+  --shadow:0 1px 2px rgba(20,33,61,.04), 0 8px 22px -12px rgba(20,33,61,.14);
+  --shadow-lift:0 2px 4px rgba(20,33,61,.06), 0 18px 34px -16px rgba(20,33,61,.22);
+  --r-organic:22px 20px 24px 21px;
+}
