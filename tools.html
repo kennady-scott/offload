@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every tool — Offload</title>
+<meta name="description" content="Every Offload tool, what it's for, and what's ready to use right now. Free, no account needed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
+<link rel="stylesheet" href="css/tokens.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--cream);
+     color:var(--ink);-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.55}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 46px}
+
+/* nav — matches index.html */
+.nav{display:flex;align-items:center;gap:26px;padding:22px 46px 0;max-width:1400px;margin:0 auto}
+.logo{position:relative;display:block;flex:none;width:196px}
+.logo-word{font-family:"Playfair Display",serif;font-weight:900;font-size:33px;letter-spacing:-.02em;line-height:1}
+.logo-mark{position:absolute;left:4px;top:25px;width:168px;height:18px;overflow:visible}
+.logo-spark{position:absolute;left:146px;top:-3px;width:34px;height:34px}
+.links{display:flex;align-items:center;gap:30px;font-size:15px;font-weight:500}
+.links a:hover{color:var(--blue)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:20px}
+.btn{display:inline-flex;align-items:center;background:var(--ink);color:#fff;font-size:15px;font-weight:600;
+     padding:13px 24px;border-radius:10px;box-shadow:0 2px 8px -2px rgba(20,33,61,.35);transition:.16s}
+.btn:hover{transform:translateY(-1px);background:#1B2C50}
+
+/* head */
+.head{padding:46px 0 34px;text-align:center}
+.head h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(36px,4.4vw,54px);
+         letter-spacing:-.03em;line-height:1.04;margin:0}
+.head p{font-size:18px;color:var(--ink-2);margin:14px auto 0;max-width:40em}
+.head .free{display:inline-flex;align-items:center;gap:9px;margin-top:18px;font-size:14.5px;color:var(--ink-2)}
+.head .tick{width:22px;height:22px;border-radius:50%;background:var(--yellow);display:grid;place-items:center}
+.head .tick svg{width:12px;height:12px;stroke:var(--ink);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* groups */
+.group{margin-bottom:34px}
+.ghead{display:flex;align-items:center;gap:12px;margin:0 0 14px}
+.ghead h2{font-family:Caveat,cursive;font-weight:700;font-size:28px;margin:0;line-height:1}
+.ghead .rule{flex:1;height:10px}
+.ghead .rule svg{width:100%;height:10px;overflow:visible}
+.ghead .note{font-family:Caveat,cursive;font-size:19px;color:var(--ink-3);white-space:nowrap}
+
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--paper);
+      border:1.5px solid var(--line);border-radius:var(--r-organic);padding:17px 17px 15px;
+      box-shadow:var(--shadow);transition:transform .18s cubic-bezier(.2,.7,.3,1),box-shadow .18s,border-color .18s}
+a.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift);border-color:rgba(53,103,232,.5)}
+.card.soon{background:#FCFCFD;box-shadow:none;border-style:dashed}
+.blob{flex:none;width:50px;height:50px;display:grid;place-items:center;
+      border-radius:58% 42% 47% 53% / 45% 55% 45% 55%;transform:rotate(-6deg)}
+.blob svg{width:25px;height:25px;stroke:var(--ink);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transform:rotate(6deg)}
+.card.soon .blob{opacity:.55}
+.body{min-width:0;flex:1}
+.card h3{margin:2px 0 3px;font-size:16.5px;font-weight:700;letter-spacing:-.012em}
+.card .thought{margin:0;font-family:Caveat,cursive;font-size:19px;line-height:1.25;color:#3F4E6B}
+.card.soon h3,.card.soon .thought{color:var(--ink-3)}
+.status{display:inline-flex;align-items:center;gap:5px;margin-top:9px;font-size:9.5px;font-weight:700;
+        letter-spacing:.075em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 7px;color:var(--ink-3)}
+.status i{width:5px;height:5px;border-radius:50%;background:var(--ink-3);display:block}
+.status.live{color:#2E7A52;border-color:rgba(46,122,82,.3)}
+.status.live i{background:var(--green)}
+.go{position:absolute;right:14px;bottom:12px;width:20px;height:16px;stroke:rgba(20,33,61,.35);
+    fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:.18s}
+a.card:hover .go{transform:translateX(4px);stroke:var(--blue)}
+.go.ext{width:17px;height:17px;bottom:13px}
+a.card:hover .go.ext{transform:translate(3px,-3px)}
+
+.foot-note{border-top:1.5px solid var(--line);margin-top:16px;padding:26px 0 40px;text-align:center;
+           font-size:15px;color:var(--ink-2)}
+.foot-note a{color:var(--blue);font-weight:600}
+footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
+.foot-row{display:flex;align-items:center;gap:26px;flex-wrap:wrap;font-size:14px;color:var(--ink-3)}
+.foot-row nav{display:flex;gap:22px;margin-left:auto}
+.foot-row nav a:hover{color:var(--ink)}
+
+@media (max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.links{display:none}}
+@media (max-width:660px){.grid{grid-template-columns:1fr}.wrap{padding:0 24px}.nav{padding:18px 24px 0}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="logo" href="index.html" aria-label="Offload home">
+    <span class="logo-word">Offload<i style="font-style:normal">.</i></span>
+    <svg class="logo-mark" viewBox="0 0 168 18" fill="none">
+      <path d="M4 11.5C25 6.5 72 4.6 125 9" stroke="#FFD44D" stroke-width="7" stroke-linecap="round"/>
+      <path d="M6 15.5C29 12 76 10.5 117 13.5" stroke="#FFD44D" stroke-width="3.4" stroke-linecap="round" opacity=".75"/>
+    </svg>
+    <svg class="logo-spark" viewBox="0 0 34 34" fill="none" stroke="#FFC53D" stroke-width="2.6" stroke-linecap="round">
+      <path d="M6 17h7M9 8l5 4.5M9 26l5-4.5"/>
+    </svg>
+  </a>
+  <nav class="links">
+    <a href="index.html#how">How It Works</a>
+    <a href="tools.html">Tools</a>
+  </nav>
+  <div class="nav-right">
+    <a href="app.html">Log in</a>
+    <a class="btn" href="app.html">Sign up free</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="head">
+    <h1>Every tool in Offload</h1>
+    <p>Each one does a single annoying job, on its own, with nothing to set up. Some are ready today
+       and the rest are being built.</p>
+    <span class="free">
+      <span class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.4 4.6 9 10 3.2"/></svg></span>
+      Every tool is free, and none of them need an account.
+    </span>
+  </div>
+
+  <!-- RIGHT NOW -->
+  <section class="group">
+    <div class="ghead">
+      <h2>Right now</h2>
+      <span class="rule"><svg viewBox="0 0 300 10" preserveAspectRatio="none" fill="none"><path d="M2 6C60 3 190 3.4 298 5.2" stroke="rgba(20,33,61,.18)" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+      <span class="note">the fires</span>
+    </div>
+    <div class="grid">
+
+      <div class="card soon">
+        <span class="blob" style="background:#FFEDF2"><svg viewBox="0 0 24 24"><path d="M3.9 7A2.6 2.6 0 0 1 6.5 4.4h11A2.6 2.6 0 0 1 20.1 7v6.9a2.6 2.6 0 0 1-2.6 2.6h-7.2l-4.5 3.4v-3.4h-.7A2.6 2.6 0 0 1 3.9 14z"/><path d="M8.5 10.4h.01M12 10.4h.01M15.5 10.4h.01"/></svg></span>
+        <div class="body"><h3>Say This</h3><p class="thought">&ldquo;A kid is pushing back.&rdquo;</p>
+        <span class="status"><i></i>in build</span></div>
+      </div>
+
+      <div class="card soon">
+        <span class="blob" style="background:#FFF6DC"><svg viewBox="0 0 24 24"><path d="M13.6 2.8 5.6 13.4h5l-1.2 7.8 8.2-10.8h-5.2z"/></svg></span>
+        <div class="body"><h3>Get Them Back</h3><p class="thought">&ldquo;I am losing this class.&rdquo;</p>
+        <span class="status"><i></i>in build</span></div>
+      </div>
+
+      <a class="card" href="https://kennadyscott.github.io/bellringers/" target="_blank" rel="noopener">
+        <span class="blob" style="background:#F3EFFF"><svg viewBox="0 0 24 24"><path d="M6.4 10.4a5.6 5.6 0 0 1 11.2 0c0 4 1.4 5.6 1.4 5.6H5s1.4-1.6 1.4-5.6z"/><path d="M10.2 19.2a2 2 0 0 0 3.6 0"/></svg></span>
+        <div class="body"><h3>Bellringers</h3><p class="thought">&ldquo;I need them working the second they sit down.&rdquo;</p>
+        <span class="status live"><i></i>ready now</span></div>
+        <svg class="go ext" viewBox="0 0 22 16"><path d="M13.4 2.4h6v6"/><path d="M19.4 2.4 11.6 10.2"/><path d="M16.4 11.6v2.8a1 1 0 0 1-1 1H3.6a1 1 0 0 1-1-1V4.6a1 1 0 0 1 1-1h2.8"/></svg>
+      </a>
+
+      <a class="card" href="https://kennadyscott.github.io/before-the-bell/" target="_blank" rel="noopener">
+        <span class="blob" style="background:#E9F7EE"><svg viewBox="0 0 24 24"><path d="M7 3.6h10M7 20.4h10"/><path d="M8.4 3.6v3.2c0 2 3.6 3.6 3.6 5.2s-3.6 3.2-3.6 5.2v3.2M15.6 3.6v3.2c0 2-3.6 3.6-3.6 5.2s3.6 3.2 3.6 5.2v3.2"/></svg></span>
+        <div class="body"><h3>Before the Bell</h3><p class="thought">&ldquo;We finished and there&rsquo;s five minutes left.&rdquo;</p>
+        <span class="status live"><i></i>ready now</span></div>
+        <svg class="go ext" viewBox="0 0 22 16"><path d="M13.4 2.4h6v6"/><path d="M19.4 2.4 11.6 10.2"/><path d="M16.4 11.6v2.8a1 1 0 0 1-1 1H3.6a1 1 0 0 1-1-1V4.6a1 1 0 0 1 1-1h2.8"/></svg>
+      </a>
+
+      <div class="card soon">
+        <span class="blob" style="background:#FFF1E7"><svg viewBox="0 0 24 24"><path d="M3.5 9.9a1.5 1.5 0 0 1 1.5-1.5h14a1.5 1.5 0 0 1 1.5 1.5v8.6a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M7.3 8.4V5.3a1 1 0 0 1 1-1h7.4a1 1 0 0 1 1 1v3.1"/><path d="m3.8 10.3 8.2 5.5 8.2-5.5"/></svg></span>
+        <div class="body"><h3>Home Note</h3><p class="thought">&ldquo;I need to contact home.&rdquo;</p>
+        <span class="status"><i></i>in build</span></div>
+      </div>
+
+      <div class="card soon">
+        <span class="blob" style="background:#E9F2FF"><svg viewBox="0 0 24 24"><path d="M5.8 9.5a3.2 3.2 0 0 1 3.2-3.2h6a3.2 3.2 0 0 1 3.2 3.2v8.9a1.6 1.6 0 0 1-1.6 1.6H7.4a1.6 1.6 0 0 1-1.6-1.6z"/><path d="M9.2 6.3V5.5A2.8 2.8 0 0 1 12 2.7a2.8 2.8 0 0 1 2.8 2.8v.8"/><path d="M8.7 13.4h6.6v6.6H8.7z"/></svg></span>
+        <div class="body"><h3>Sub Day</h3><p class="thought">&ldquo;I can&rsquo;t come in tomorrow.&rdquo;</p>
+        <span class="status"><i></i>in build</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- GET SOMETHING DONE -->
+  <section class="group">
+    <div class="ghead">
+      <h2>Get something done</h2>
+      <span class="rule"><svg viewBox="0 0 300 10" preserveAspectRatio="none" fill="none"><path d="M2 6C60 3 190 3.4 298 5.2" stroke="rgba(20,33,61,.18)" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+      <span class="note">no rush, still annoying</span>
+    </div>
+    <div class="grid">
+
+      <div class="card soon">
+        <span class="blob" style="background:#DCF2E3"><svg viewBox="0 0 24 24"><path d="M8 3.6v16.8M16 3.6v16.8"/><path d="M8 7.6h8M8 12h8M8 16.4h8"/></svg></span>
+        <div class="body"><h3>Adapt It</h3><p class="thought">&ldquo;This won&rsquo;t work for everyone.&rdquo;</p>
+        <span class="status"><i></i>in build</span></div>
+      </div>
+
+      <div class="card soon">
+        <span class="blob" style="background:#FFF0C2"><svg viewBox="0 0 24 24"><path d="M7.6 3.9h9.6a1.1 1.1 0 0 1 1.1 1.1v14.2a1.1 1.1 0 0 1-1.1 1.1H7.6a1.1 1.1 0 0 1-1.1-1.1V5a1.1 1.1 0 0 1 1.1-1.1z"/><path d="M9.6 8.6h5.8M9.6 12h5.8M9.6 15.4h3.6"/><path d="M6.5 6.4H4.3M6.5 9.5H4.3M6.5 12.6H4.3M6.5 15.7H4.3M6.5 18.8H4.3"/></svg></span>
+        <div class="body"><h3>Catch Me Up</h3><p class="thought">&ldquo;They were absent. What do they need?&rdquo;</p>
+        <span class="status"><i></i>in build</span></div>
+      </div>
+
+      <div class="card soon">
+        <span class="blob" style="background:#FFE1EA"><svg viewBox="0 0 24 24"><path d="M3.9 14h4.2l1.2 2.2h5.4l1.2-2.2h4.2v4.6a1.5 1.5 0 0 1-1.5 1.5H5.4a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M7.9 11.9V5.6a1 1 0 0 1 1-1h6.2a1 1 0 0 1 1 1v6.3"/><path d="M10.2 7.7h3.6M10.2 10.1h3.6"/></svg></span>
+        <div class="body"><h3>Tiny Things</h3><p class="thought">&ldquo;I just need this annoying thing done.&rdquo;</p>
+        <span class="status"><i></i>in build</span></div>
+      </div>
+
+      <a class="card" href="https://plotruckus.com" target="_blank" rel="noopener">
+        <span class="blob" style="background:#E9E2FF"><svg viewBox="0 0 24 24"><path d="M12 6.6C10.4 4.9 7.9 4.2 4.4 4.4v12.9c3.5-.2 6 .5 7.6 2.2 1.6-1.7 4.1-2.4 7.6-2.2V4.4c-3.5-.2-6 .5-7.6 2.2z"/><path d="M12 6.6v12.9"/></svg></span>
+        <div class="body"><h3>Plot Ruckus</h3><p class="thought">&ldquo;Run a book club kids argue about.&rdquo;</p>
+        <span class="status live"><i></i>ready now</span></div>
+        <svg class="go ext" viewBox="0 0 22 16"><path d="M13.4 2.4h6v6"/><path d="M19.4 2.4 11.6 10.2"/><path d="M16.4 11.6v2.8a1 1 0 0 1-1 1H3.6a1 1 0 0 1-1-1V4.6a1 1 0 0 1 1-1h2.8"/></svg>
+      </a>
+
+    </div>
+  </section>
+
+  <p class="foot-note">
+    Already set up your classes? <a href="app.html">Go to your Offload home &rarr;</a>
+  </p>
+</div>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>&copy; 2026 Offload</span>
+    <nav>
+      <a href="index.html#how">How It Works</a>
+      <a href="tools.html">Tools</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
