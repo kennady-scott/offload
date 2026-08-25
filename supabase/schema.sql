@@ -83,6 +83,18 @@ create policy students_update on public.students for update
 create policy students_delete on public.students for delete
   using (teacher_id = auth.uid());
 
+-- ─────────────────────────── grants ────────────────────────────────────
+-- RLS decides WHICH ROWS a role may see. GRANT decides whether the role may
+-- touch the table at all. Both are required — policies alone give 42501.
+--
+-- Deliberately NOT granted to `anon`: signed-out teachers use localStorage and
+-- never call the API, so the anonymous role has no reason to reach these tables.
+-- A keyless or signed-out request failing with 42501 is a stronger guarantee
+-- than it succeeding and returning an empty array.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.classes  to authenticated;
+grant select, insert, update, delete on public.students to authenticated;
+
 -- ─────────────────────────── updated_at ────────────────────────────────
 create or replace function public.touch_updated_at() returns trigger
 language plpgsql as $$
@@ -96,6 +108,6 @@ create trigger students_touch before update on public.students
   for each row execute function public.touch_updated_at();
 
 -- ─────────────────────────── verify ────────────────────────────────────
--- Signed out, this must return zero rows rather than an error:
---   select count(*) from public.classes;
--- Signed in as two different teachers, each must see only their own.
+-- Signed out / keyless, reads must FAIL with 42501 (permission denied) — anon is
+-- intentionally not granted anything. Signed in, each teacher must see only their
+-- own rows; that is RLS doing its job on top of the grant.
