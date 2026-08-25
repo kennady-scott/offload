@@ -1,137 +1,121 @@
-/* Get Them Back — routing + render.
-   Same hash-route shape as Say This (#/too-wild) so a link to one situation is
-   shareable, the back button behaves, and the two tools feel like one product. */
+/* Get Them Back — pick a state, get three moves.
+   Hash routes so a link to a state is shareable, matching the other tools. */
 
-const view    = document.getElementById("view");
+const view = document.getElementById("view");
 const toastEl = document.getElementById("toast");
+let offset = 0;                     // which slice of six is showing
 
-let setIndex = 0;                       // which of the three sets of moves is showing
+const byId = id => STATES.find(s => s.id === id);
+const esc = t => String(t == null ? "" : t).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+let tTimer;
+const toast = m => { toastEl.textContent = m; toastEl.hidden = false;
+  clearTimeout(tTimer); tTimer = setTimeout(() => toastEl.hidden = true, 1800); };
 
-const byId = id => SITUATIONS.find(s => s.id === id);
-const esc  = t => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
-
-let toastTimer;
-function toast(msg) {
-  toastEl.textContent = msg; toastEl.hidden = false;
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastEl.hidden = true; }, 1900);
-}
-async function copy(text, msg) {
-  try { await navigator.clipboard.writeText(text); toast(msg || "Copied"); }
-  catch (e) {                                        // clipboard API needs https or localhost
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast("Copied"); }
+  catch (e) {
     const ta = document.createElement("textarea");
     ta.value = text; document.body.appendChild(ta); ta.select();
-    try { document.execCommand("copy"); toast(msg || "Copied"); }
-    catch (e2) { toast("Press ⌘C to copy"); }
+    try { document.execCommand("copy"); toast("Copied"); } catch (e2) { toast("Press ⌘C to copy"); }
     ta.remove();
   }
+}
+
+/* The rule: an untagged move suits any grade, so it always shows. A tagged move
+   only shows for those bands. If that leaves nothing, show everything and say so —
+   never hand back an empty screen. */
+function movesFor(s) {
+  let bands = [];
+  try { bands = (window.TeacherPlate && TeacherPlate.gradeBands) ? TeacherPlate.gradeBands() : []; }
+  catch (e) {}
+  if (!bands.length) return { list: s.moves, widened: false };
+  const fit = s.moves.filter(m => !m.bands || m.bands.some(b => bands.indexOf(b) > -1));
+  return fit.length ? { list: fit, widened: false } : { list: s.moves, widened: true };
 }
 
 const COPY_ICON =
   '<svg viewBox="0 0 24 24"><rect x="8.6" y="8.6" width="11" height="11.4" rx="2"/>' +
   '<path d="M15.4 5.4H6.4a2 2 0 0 0-2 2v9"/></svg>';
 
-/* ── step 1: what's happening in the room ───────────────────────── */
 function renderPicker() {
   view.innerHTML =
     '<h2 class="ask">What&rsquo;s happening in your room?</h2>' +
-    '<p class="ask-sub">Pick the closest one. You&rsquo;ll get three things to try right now.</p>' +
-    '<div class="sits">' +
-      SITUATIONS.map(s =>
-        '<button class="sit" data-go="' + s.id + '">' +
-          '<span class="e">' + s.emoji + '</span>' +
-          '<b>' + esc(s.label) + '</b>' +
-          '<span class="h">' + esc(s.hint) + '</span>' +
-        '</button>').join("") +
-    '</div>' +
-    // The disambiguation that stops this tool and Say This from being confused.
-    '<p class="sib">One student, not the whole room? That&rsquo;s ' +
-      '<a href="/say-this/">Say This</a> &mdash; what to say when a kid pushes back.</p>';
+    '<p class="ask-sub">Closest one wins. You&rsquo;ll get three things to try right now.</p>' +
+    '<div class="states">' +
+      STATES.map(s =>
+        '<button class="st" data-go="' + s.id + '"><span class="e">' + s.emoji + '</span>' +
+        '<b>' + esc(s.label) + '</b><span class="h">' + esc(s.hint) + '</span></button>').join("") +
+    '</div>';
 }
 
-/* ── step 2: three moves ────────────────────────────────────────── */
-function moveCard(m, i) {
-  return '<div class="move">' +
-    '<div class="mh"><span class="n">' + (i + 1) + '</span>' +
-      '<span class="cost">' + esc(m.cost) + '</span></div>' +
-    '<h3>' + esc(m.name) + '</h3>' +
-    '<p class="do">' + esc(m.do) + '</p>' +
-    (m.say
-      ? '<p class="say">' + esc(m.say) + '</p>' +
-        '<button class="copy" data-copysay="' + i + '">' + COPY_ICON + 'Copy the line</button>'
-      : "") +
-    '<p class="why">' + esc(m.why) + '</p>' +
-  '</div>';
-}
-
-function renderAnswer(s) {
-  const set = s.sets[setIndex % s.sets.length];
+function renderMoves(s) {
+  const pool = movesFor(s);
+  const n = pool.list.length;
+  const show = [0, 1, 2].map(i => pool.list[(offset + i) % n]);
   view.innerHTML =
     '<div class="answer">' +
-      '<div class="crumb">' +
-        '<button class="back" data-back>' +
-          '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" ' +
-          'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 3 5 7l3.5 4"/></svg>' +
-          'Something else</button>' +
-      '</div>' +
+      '<div class="crumb"><button class="back" data-back>' +
+        '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" ' +
+        'stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 3 5 7l3.5 4"/></svg>' +
+        'Something else</button></div>' +
       '<h2 class="restate">' + esc(s.restate) + '</h2>' +
-      '<p class="setno">Three moves &mdash; set ' + ((setIndex % s.sets.length) + 1) + ' of ' + s.sets.length + '</p>' +
-      (s.read ? '<div class="read"><b>👀</b><span>' + esc(s.read) + '</span></div>' : "") +
-      '<div class="moves">' + set.map(moveCard).join("") + '</div>' +
+      '<p class="nowline">Try this now &mdash; pick one and commit.</p>' +
+      '<div class="moves">' +
+        show.map(m =>
+          '<div class="mv"><div class="n"><h3>' + esc(m.name) + '</h3>' +
+          '<span class="mins">' + m.mins + ' min</span></div>' +
+          '<p>' + esc(m.do) + '</p>' +
+          '<button class="copy" data-copy="' + esc(m.name) + '">' + COPY_ICON + 'Copy</button></div>').join("") +
+      '</div>' +
+      (pool.widened
+        ? '<p class="gradenote">Some of these need more independent writing than your grades usually manage, ' +
+          'so this is everything. Adapt down as you go.</p>' : '') +
+      (s.seeAlso
+        ? '<p class="seealso">&rarr; <a href="' + s.seeAlso.href + '">' + esc(s.seeAlso.label) + '</a></p>' : '') +
       '<div class="next">' +
-        '<button class="act primary" data-another>' +
+        '<button class="act primary" data-more>' +
           '<svg viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg>' +
           'Three more</button>' +
-        (s.handoff
-          ? '<a class="act" href="' + s.handoff.href + '">' +
-              '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M12 7.3V12l3 2"/></svg>' +
-              esc(s.handoff.label) + '</a>'
-          : '<a class="act" href="/before-the-bell/">' +
-              '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M12 7.3V12l3 2"/></svg>' +
-              'Need a whole activity?</a>') +
-        '<a class="act" href="/say-this/">' +
-          '<svg viewBox="0 0 24 24"><path d="M3.9 7A2.6 2.6 0 0 1 6.5 4.4h11A2.6 2.6 0 0 1 20.1 7v6.9a2.6 2.6 0 0 1-2.6 2.6h-7.2l-4.5 3.4v-3.4h-.7A2.6 2.6 0 0 1 3.9 14z"/></svg>' +
-          'It&rsquo;s one kid</a>' +
+        '<a class="act" href="/say-this/">It&rsquo;s one student, not the room</a>' +
       '</div>' +
     '</div>';
 }
 
-/* ── router ─────────────────────────────────────────────────────── */
 function route() {
   const id = (location.hash || "").replace(/^#\/?/, "");
   const s = byId(id);
-  if (s) { document.title = "Get Them Back — " + s.label + " | Teacher Plate"; renderAnswer(s); }
-  else   { document.title = "Get Them Back — the lesson is dying | Teacher Plate"; setIndex = 0; renderPicker(); }
+  if (s) { document.title = "Get Them Back — " + s.label + " | Teacher Plate"; renderMoves(s); }
+  else { document.title = "Get Them Back — quick moves when the lesson is dying | Teacher Plate";
+         offset = 0; renderPicker(); }
   window.scrollTo(0, 0);
 }
 window.addEventListener("hashchange", route);
 
-/* ── events ─────────────────────────────────────────────────────── */
 document.addEventListener("click", e => {
   const go = e.target.closest("[data-go]");
-  if (go) { setIndex = 0; location.hash = "#/" + go.dataset.go; return; }
-
+  if (go) { offset = 0; location.hash = "#/" + go.dataset.go; return; }
   if (e.target.closest("[data-back]")) { location.hash = ""; return; }
 
   const cur = byId((location.hash || "").replace(/^#\/?/, ""));
   if (!cur) return;
 
-  if (e.target.closest("[data-another]")) {
-    setIndex = (setIndex + 1) % cur.sets.length;
-    renderAnswer(cur);
-    toast("Set " + (setIndex + 1) + " of " + cur.sets.length);
+  if (e.target.closest("[data-more]")) {
+    const n = movesFor(cur).list.length;
+    offset = (offset + 3) % n;
+    renderMoves(cur);
+    toast("Three more");
     return;
   }
-
-  const c = e.target.closest("[data-copysay]");
+  const c = e.target.closest("[data-copy]");
   if (c) {
-    const m = cur.sets[setIndex % cur.sets.length][Number(c.dataset.copysay)];
-    // Copy without the curly quotes — they're for reading, not for pasting.
-    copy(String(m.say).replace(/[“”]/g, ""), "Line copied");
+    const m = movesFor(cur).list.find(x => x.name === c.dataset.copy);
+    if (m) copy(m.name + " — " + m.do);
   }
 });
 
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && location.hash) { location.hash = ""; }
-});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && location.hash) location.hash = ""; });
 
+if (window.TeacherPlate && TeacherPlate.onChange) {
+  TeacherPlate.onChange(() => { if (location.hash) route(); });
+}
 route();
