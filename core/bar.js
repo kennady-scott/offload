@@ -1,25 +1,25 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   Offload bar — the strip that makes ten separate tools feel like one product.
+   Teacher Plate bar — the strip that makes ten separate tools feel like one product.
    Drop into any tool page:
 
-     <script src="/offload-core/offload-bar.js"
+     <script src="/core/bar.js"
              data-hub="/app.html"></script>
 
    Design constraints, learned from the host pages it has to live on:
    • Normal flow, NOT sticky. Tool pages have their own sticky headers, and
-     Bellringers projects full-screen to a class — a pinned Offload bar would
+     Bellringers projects full-screen to a class — a pinned Teacher Plate bar would
      fight the header and hover over a lesson. Opt in with data-sticky="true".
    • Shadow DOM + self-contained palette. Host pages define their own --ink,
      --line, --paper; inheriting those would repaint the bar unpredictably.
    • Works signed out. Anonymous is the default state, not a degraded one.
    ───────────────────────────────────────────────────────────────────────── */
 (function () {
-  if (window.Offload) return;                       // idempotent
+  if (window.TeacherPlate) return;                       // idempotent
 
   var TAG  = document.currentScript;
   var HUB  = (TAG && TAG.dataset.hub)  || "/app.html";
   var PIN  = (TAG && TAG.dataset.sticky) === "true";
-  var NS   = "offload.v1.";
+  var NS   = "tp.v1.";
 
   /* ── state ───────────────────────────────────────────────────────────── */
   // Seed data. Replaced by the Supabase `classes` read once auth lands;
@@ -54,7 +54,7 @@
 
   /* ── shell ───────────────────────────────────────────────────────────── */
   var host = document.createElement("div");
-  host.id = "offload-bar";
+  host.id = "tp-bar";
   host.style.cssText = "display:block;width:100%;" +
     (PIN ? "position:sticky;top:0;z-index:40;" : "");
   var root = host.attachShadow({ mode: "open" });
@@ -80,10 +80,8 @@
     .home .chev{ width:14px; height:14px; stroke:var(--ob-ink3); fill:none; stroke-width:2;
                  stroke-linecap:round; stroke-linejoin:round; flex:none }
     .home:hover .chev{ stroke:var(--ob-ink) }
-    .word{ position:relative; font-family:"Playfair Display",Georgia,serif; font-weight:800;
-           font-size:17px; letter-spacing:-.02em; line-height:1; padding-bottom:3px }
-    .word u{ position:absolute; left:0; right:2px; bottom:0; height:3px; border-radius:2px;
-             background:var(--ob-yellow) }
+    .mark{ width:26px; height:26px; object-fit:contain; display:block; flex:none }
+    .word{ font-weight:800; font-size:15px; letter-spacing:-.015em; line-height:1; white-space:nowrap }
 
     .dot{ width:3px; height:3px; border-radius:50%; background:var(--ob-ink3); opacity:.5; flex:none }
 
@@ -165,7 +163,7 @@
 
   function rightInner() {
     if (!user) {
-      return '<span class="who">Using Offload without an account</span>' +
+      return '<span class="who">Using Teacher Plate without an account</span>' +
              '<button class="ghost" data-act="signin">Sign in</button>';
     }
     return '<div class="wrap">' +
@@ -174,7 +172,7 @@
              CARET +
            '</button>' +
            '<div class="menu to-end" data-panel="user" role="menu">' +
-             '<a class="item" href="' + HUB + '"><span class="t"><b>Offload home</b></span></a>' +
+             '<a class="item" href="' + HUB + '"><span class="t"><b>Teacher Plate home</b></span></a>' +
              '<a class="item" href="' + HUB + '"><span class="t"><b>Saved</b></span></a>' +
              '<a class="item" href="' + HUB + '"><span class="t"><b>Recent</b></span></a>' +
              '<div class="sep"></div>' +
@@ -188,7 +186,7 @@
       '<div class="bar">' +
         '<a class="home" href="' + HUB + '">' +
           '<svg class="chev" viewBox="0 0 14 14"><path d="M8.5 3 5 7l3.5 4"/></svg>' +
-          '<span class="word">Offload.<u></u></span>' +
+          '<img class="mark" src="/img/teacher-plate-mark.png" alt=""><span class="word">Teacher Plate</span>' +
         '</a>' +
         '<span class="dot"></span>' +
         '<div class="wrap">' +
@@ -219,12 +217,12 @@
       return;
     }
     var pick = e.target.closest("[data-pick]");
-    if (pick) { Offload.setClass(pick.dataset.pick); closeMenus(); return; }
+    if (pick) { TeacherPlate.setClass(pick.dataset.pick); closeMenus(); return; }
 
     var act = e.target.closest("[data-act]");
     if (act) {
-      if (act.dataset.act === "signin")  Offload.signIn();
-      if (act.dataset.act === "signout") Offload.signOut();
+      if (act.dataset.act === "signin")  TeacherPlate.signIn();
+      if (act.dataset.act === "signout") TeacherPlate.signOut();
       closeMenus();
     }
   });
@@ -237,7 +235,7 @@
   });
 
   /* ── public API — the contract every tool codes against ──────────────── */
-  window.Offload = {
+  window.TeacherPlate = {
     version: "0.1.0",
     user:         function () { return user; },
     classes:      function () { return CLASSES.slice(); },
@@ -257,11 +255,10 @@
   function mount() {
     render();
     document.body.insertBefore(host, document.body.firstChild);
-    if (!document.querySelector('link[data-offload-font]')) {
+    if (!document.querySelector('link[data-tp-font]')) {
       var l = document.createElement("link");
-      l.rel = "stylesheet"; l.setAttribute("data-offload-font", "");
-      l.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@800&" +
-               "family=Inter:wght@400;500;600;700&display=swap";
+      l.rel = "stylesheet"; l.setAttribute("data-tp-font", "");
+      l.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
       document.head.appendChild(l);
     }
     emit();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Offload bar — harness</title>
+<title>Teacher Plate bar — harness</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   html,body{margin:0}
@@ -20,7 +20,7 @@
   button.t:hover{border-color:#14213D}
   #log{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#3C4C6B;white-space:pre-wrap}
 </style>
-<script src="offload-bar.js" data-hub="../app.html"></script>
+<script src="bar.js" data-hub="../app.html"></script>
 </head>
 <body>
 <div class="page">
@@ -30,10 +30,10 @@
   <div class="card">
     <strong>Try it</strong>
     <p>Switch class in the bar, then sign in and out. The tool below reacts through
-       <code>Offload.onChange()</code> &mdash; no page reload.</p>
-    <button class="t" onclick="Offload.signIn()">Sign in</button>
-    <button class="t" onclick="Offload.signOut()">Sign out</button>
-    <button class="t" onclick="Offload.setClass(null)">Clear class</button>
+       <code>TeacherPlate.onChange()</code> &mdash; no page reload.</p>
+    <button class="t" onclick="TeacherPlate.signIn()">Sign in</button>
+    <button class="t" onclick="TeacherPlate.signOut()">Sign out</button>
+    <button class="t" onclick="TeacherPlate.setClass(null)">Clear class</button>
   </div>
 
   <div class="card">
@@ -43,12 +43,12 @@
 
   <div class="card">
     <strong>Drop-in</strong>
-    <pre>&lt;script src="/offload-core/offload-bar.js" data-hub="/app.html"&gt;&lt;/script&gt;</pre>
+    <pre>&lt;script src="/core/bar.js" data-hub="/app.html"&gt;&lt;/script&gt;</pre>
   </div>
 </div>
 
 <script>
-  Offload.onChange(function (s) {
+  TeacherPlate.onChange(function (s) {
     document.getElementById('log').textContent = JSON.stringify({
       user: s.user, currentClass: s.klass
     }, null, 2);
