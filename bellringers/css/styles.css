@@ -731,3 +731,9 @@ h1,h2,h3,h4{ font-family:var(--display); margin:0; letter-spacing:-.02em; }
 
 .card-live .zoom-frame{ width:56px; height:56px; box-shadow:none; }
 .card-live .zoom-emoji{ font-size:42px; }
+
+/* Shown when a remembered grade filter found nothing and we widened it. */
+.grade-note{
+  margin:14px 0 0; padding:11px 14px; font-size:13.5px; line-height:1.55;
+  background:#FFF7E6; border:1.5px solid rgba(232,118,58,.28); border-radius:11px; color:#8A5A10;
+}

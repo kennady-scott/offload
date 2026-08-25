@@ -581,7 +581,13 @@ function viewBrowse(p) {
   const f = { cat:p.cat, grade:("grade" in p ? p.grade : defaultBand()),
               vibe:p.vibe, moment:p.moment, exact:p.exact,
               q:p.q, fav:p.fav === "1", coll:p.coll };
-  const results = filterActivities(f);
+  let results = filterActivities(f);
+  /* Same rule: never let the remembered grade produce an empty page. */
+  let gradeFellBack = false;
+  if (!results.length && f.grade) {
+    const wider = filterActivities(Object.assign({}, f, { grade: null }));
+    if (wider.length) { results = wider; gradeFellBack = true; f = Object.assign({}, f, { grade: null }); }
+  }
   const c = f.cat ? cat(f.cat) : null;
   const m = f.moment ? MOMENTS.find(x => x.key === f.moment) : null;
   const d = f.exact ? DURATIONS.find(x => String(x.key) === String(f.exact)) : null;

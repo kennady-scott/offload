@@ -627,7 +627,18 @@ function homeSeqPanelHTML(){
 }
 
 function viewLibrary(){
-  const list = filtered();
+  /* Rule: filter to their grade when the content is tagged for it — but never hand
+     back an empty screen. No deck is tagged 9-12 yet, so a high-school teacher would
+     otherwise see nothing at all. Fall back to everything and say why. */
+  let list = filtered();
+  let gradeFellBack = false;
+  if (!list.length && state.grades.size) {
+    const held = new Set(state.grades);
+    state.grades.clear();
+    const wider = filtered();
+    state.grades = held;
+    if (wider.length) { list = wider; gradeFellBack = true; }
+  }
   const sit = SITUATIONS.find(s => s.id === state.situation);
   return `
   <div class="page">
@@ -643,6 +654,7 @@ function viewLibrary(){
     ${list.length
       ? `<div class="grid">${list.map(cardHTML).join("")}</div>`
       : `<div class="empty"><b>Nothing matches all of that.</b>Try clearing the subject filter — a lot of Bellringers work in any class.</div>`}
+    ${gradeFellBack ? `<p class="grade-note">Nothing here is tagged for your grades yet, so this is everything. The activities still work — you'll just be adapting up or down.</p>` : ""}
   </div>`;
 }
 
