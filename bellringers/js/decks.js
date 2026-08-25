@@ -12,7 +12,9 @@
      group        whole | pairs | solo
      situations   which homepage tiles this shows up under
      featured     shows on the homepage carousel
-     hero         this deck carries the format's slide art (one per format)
+     hero         this deck carries the FORMAT's slide art (one per format)
+     art          this deck's own edition slide; overrides the format art
+     direction    overrides the format's direction line (K-2 editions reword it)
      prompts      shape depends on FORMATS[format].render
 */
 
@@ -50,6 +52,7 @@ const DECKS = [
   subtitle: "The debates they already have in the hallway. Now with rules.",
   minutes: 5, grades: ["35","68"], subjects: ["social","sel"], energy: "medium", group: "whole",
   situations: ["talking","walked-in","review"],
+  art: "img/pick-a-side-school.webp",
   prompts: [
     { stem: "Would you rather have", a:{label:"School four days a week, longer days", icon:"🗓️"}, b:{label:"Five days, shorter days", icon:"⏱️"} },
     { stem: "Would you rather", a:{label:"No homework, longer school day", icon:"🏫"}, b:{label:"Homework, out at 2:00", icon:"🎒"} },
@@ -68,6 +71,8 @@ const DECKS = [
   subtitle: "Same debate mechanic, sized for K-2. Stand on a side of the rug.",
   minutes: 2, grades: ["k2"], subjects: ["sel"], energy: "medium", group: "whole",
   situations: ["walked-in","talking","switching"],
+  art: "img/pick-a-side-k2.webp",
+  direction: "Stand on a side of the rug and <em>tell why</em>.",
   prompts: [
     { stem: "Would you rather be", a:{label:"As tiny as a mouse", icon:"🐭"}, b:{label:"As tall as a tree", icon:"🌳"} },
     { stem: "Would you rather have", a:{label:"A pet dragon", icon:"🐉"}, b:{label:"A pet dinosaur", icon:"🦕"} },
@@ -110,6 +115,7 @@ const DECKS = [
   subtitle: "The wrong answers surface the real misconceptions. Then you fix them.",
   minutes: 5, grades: ["35","68"], subjects: ["science"], energy: "high", group: "whole",
   situations: ["review","need-energy","walked-in"],
+  art: "img/wrong-answers-science.webp",
   prompts: [
     { stem: "Wrong answers only.", big: "What makes the seasons change?", sub: "Then ask for the real one. Half the room will still say “we get closer to the sun.”" },
     { stem: "Wrong answers only.", big: "Where does the mass of a tree come from?", sub: "Real answer: mostly carbon pulled out of the air." },
@@ -150,6 +156,7 @@ const DECKS = [
   subtitle: "Every one of the four is defensible. The reasoning is the assessment.",
   minutes: 5, grades: ["35","68"], subjects: ["math"], energy: "low", group: "whole",
   situations: ["review","thinking","walked-in"],
+  art: "img/odd-one-out-math.webp",
   prompts: [
     { stem: "Which number doesn't belong?", items: [ {label:"16",icon:""}, {label:"25",icon:""}, {label:"36",icon:""}, {label:"30",icon:""} ], note: "30 isn't a perfect square · 25 is the only odd one · 16 is the only power of 2 · 36 is the only multiple of 9." },
     { stem: "Which number doesn't belong?", items: [ {label:"3",icon:""}, {label:"7",icon:""}, {label:"9",icon:""}, {label:"11",icon:""} ], note: "9 isn't prime · 11 is the only two-digit · 7 is the only one not a factor or multiple of 3." },
@@ -443,6 +450,7 @@ const DECKS = [
   subtitle: "Vocabulary and word-attack, at speed.",
   minutes: 5, grades: ["35","68"], subjects: ["ela"], energy: "high", group: "whole",
   situations: ["review","need-energy","walked-in"],
+  art: "img/beat-the-teacher-words.webp",
   prompts: [
     { stem: "Round 1 — Synonyms", questions: [
       { q: "A synonym for “furious”", a: "Enraged, livid, irate" }, { q: "A synonym for “tiny”", a: "Minuscule, minute, petite" },
@@ -494,6 +502,8 @@ const DECKS = [
   subtitle: "K-2 math talk. Four things, one because, no wrong answer you can defend.",
   minutes: 2, grades: ["k2"], subjects: ["math"], energy: "low", group: "whole",
   situations: ["review","thinking","walked-in","switching"],
+  art: "img/odd-one-out-k2-math.webp",
+  direction: "Pick one and tell why. <em>More than one answer can work</em>.",
   prompts: [
     { stem: "Which one doesn't belong?", items: [ {label:"2",icon:""}, {label:"4",icon:""}, {label:"6",icon:""}, {label:"5",icon:""} ], note: "5 is the only odd one · 2 is the smallest · 6 is the biggest · 4 is the only one you can split into two equal pairs of 2." },
     { stem: "Which shape doesn't belong?", items: [ {label:"Circle",icon:"⭕"}, {label:"Square",icon:"🟦"}, {label:"Triangle",icon:"🔺"}, {label:"Star",icon:"⭐"} ], note: "Circle has no corners · triangle has the fewest sides · star has the most points · square is the only one with four equal sides." },
@@ -530,6 +540,8 @@ const DECKS = [
   subtitle: "Five fast ones for K-2. You are allowed to lose. You will lose.",
   minutes: 2, grades: ["k2"], subjects: ["math","ela"], energy: "high", group: "whole",
   situations: ["review","need-energy","walked-in"],
+  art: "img/beat-the-teacher-k2.webp",
+  direction: "<em>Work fast.</em> Teacher vs. class!",
   prompts: [
     { stem: "Round 1 — Counting", questions: [
       { q: "What comes after 9?", a: "10" }, { q: "What comes before 6?", a: "5" },

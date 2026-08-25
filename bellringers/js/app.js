@@ -65,6 +65,16 @@ function maxReveal(deck, prompt){
 
 const norm = t => String(t || "").toLowerCase().replace(/[.:!?]+$/, "").trim();
 
+/* A deck shows its own edition slide if it has one; otherwise the format's
+   slide, but only on the deck flagged `hero`, so editions never repeat it. */
+const artFor = deck => deck.art || (deck.hero ? FORMATS[deck.format].art : null);
+
+/* "Odd One Out: Numbers & Shapes" -> "Numbers & Shapes"; no colon, no badge. */
+function editionOf(deck){
+  const name = FORMATS[deck.format].name;
+  return deck.title.startsWith(name + ":") ? deck.title.slice(name.length + 1).trim() : "";
+}
+
 const DASH = `<svg class="stage-dash" viewBox="0 0 30 34" fill="none" aria-hidden="true">
   <path d="M26 4 6 10M28 17H8M26 30 6 24" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>`;
 
@@ -171,8 +181,10 @@ function renderStage(deck, prompt, rv = 0){
     }
   }
 
+  const edition = editionOf(deck);
   return `<div class="stage">
     <div class="stage-title">${DASH}<span>${esc(f.name)}</span>${DASH.replace('class="stage-dash"', 'class="stage-dash r"')}</div>
+    ${edition ? `<div class="stage-badge band-${f.band || "mint"}">${esc(edition)}</div>` : ""}
     <div class="stage-band band-${f.band || "mint"}">${band}</div>
     ${rest}
   </div>`;
@@ -224,7 +236,8 @@ function paintPlayer(){
   const f = FORMATS[deck.format];
   $("#playerStage").innerHTML = renderStage(deck, prompt, P.rv);
   $("#playerTitle").textContent = `${deck.title} · ${P.idx + 1} of ${deck.prompts.length}`;
-  $("#playerDirection").innerHTML = f.direction ? `<span class="pd-text">${f.direction}</span>` : "";
+  const direction = deck.direction || f.direction;
+  $("#playerDirection").innerHTML = direction ? `<span class="pd-text">${direction}</span>` : "";
   $("#playerChips").innerHTML =
     `<span class="pchip pchip-time">🕐 ${deck.minutes} min</span>` +
     `<span class="pchip pchip-energy e-${deck.energy}">⚡ ${deck.energy[0].toUpperCase() + deck.energy.slice(1)} energy</span>`;
@@ -439,11 +452,11 @@ function buildSequence(totalMin, opts = {}){
 function cardHTML(deck){
   const f = FORMATS[deck.format];
   const on = favorites.has(deck.id);
-  const showArt = !!(f.art && deck.hero);
+  const art = artFor(deck);
   return `
     <div class="card" data-deck="${deck.id}" role="button" tabindex="0">
-      <div class="card-art art-${f.tint}${showArt ? " has-img" : ""}">
-        ${showArt ? `<img class="card-img" src="${f.art}" alt="" loading="lazy" decoding="async">` : f.icon}
+      <div class="card-art art-${f.tint}${art ? " has-img" : ""}">
+        ${art ? `<img class="card-img" src="${art}" alt="" loading="lazy" decoding="async">` : f.icon}
         <button class="fav ${on ? "on" : ""}" data-fav="${deck.id}" aria-label="Favorite">${on ? "♥" : "♡"}</button>
       </div>
       <div class="card-body">

@@ -448,6 +448,14 @@ h1,h2,h3,h4{ font-family:var(--display); margin:0; letter-spacing:-.02em; }
 .stage-dash{ flex:0 0 auto; width:clamp(18px,2.4vw,34px); color:var(--teal); }
 .stage-dash.r{ transform:scaleX(-1); }
 
+/* the edition badge, e.g. "Little Kids" under "Pick a Side" */
+.stage-badge{
+  display:inline-block; margin:0 auto clamp(10px,1.6vh,18px);
+  padding:clamp(5px,.9vh,10px) clamp(14px,1.8vw,26px); border-radius:99px;
+  font-family:var(--display); font-weight:700; letter-spacing:-.01em;
+  font-size:clamp(14px,1.7vw,26px); color:var(--ink);
+}
+
 /* the prompt sits on a tinted band, like the slides */
 .stage-band{
   border-radius:22px; padding:clamp(16px,2.6vh,30px) clamp(18px,3vw,40px);
@@ -599,6 +607,7 @@ h1,h2,h3,h4{ font-family:var(--display); margin:0; letter-spacing:-.02em; }
 /* ═══════════════════ compact (homepage preview) ═══════════════════ */
 .preview .stage-title{ font-size:20px; margin-bottom:8px; gap:8px; }
 .preview .stage-dash{ width:13px; }
+.preview .stage-badge{ font-size:11px; padding:3px 10px; margin-bottom:6px; }
 .preview .stage-band{ border-radius:12px; padding:10px 12px; margin-bottom:10px; }
 .preview .stage-big{ font-size:15px; line-height:1.2; }
 .preview .stage-stem{ font-size:11.5px; margin-bottom:5px; }
