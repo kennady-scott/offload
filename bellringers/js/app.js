@@ -27,9 +27,20 @@ function paintFavCount(){
 }
 
 /* ─────────────── filter state ─────────────── */
+/* Seeded from Teacher Plate so a teacher doesn't re-pick their grades every visit.
+   Deliberately does NOT hide anything: `filtered()` already falls back to the whole
+   deck list when a filter empties it, which matters here because no deck is tagged
+   9-12 yet. */
+function seededGrades() {
+  try {
+    const b = (window.TeacherPlate && TeacherPlate.gradeBands) ? TeacherPlate.gradeBands() : [];
+    return new Set(b);
+  } catch (e) { return new Set(); }
+}
+
 const state = {
   time: null,          // 2 | 5 | 10 | 15
-  grades: new Set(),
+  grades: seededGrades(),
   subjects: new Set(),
   situation: null,
   previewDeck: null,

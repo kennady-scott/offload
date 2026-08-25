@@ -567,8 +567,19 @@ function featuredCard(a) {
 }
 
 /* ═══════════════════════════ BROWSE ═══════════════════════════ */
+/* One band from Teacher Plate, used only when the URL hasn't asked for a grade.
+   This filter takes a single band, so a teacher who ticked several gets their
+   first — the chips are right there to switch. */
+function defaultBand() {
+  try {
+    const b = (window.TeacherPlate && TeacherPlate.gradeBands) ? TeacherPlate.gradeBands() : [];
+    return b.length === 1 ? b[0] : (b.length ? b[0] : null);
+  } catch (e) { return null; }
+}
+
 function viewBrowse(p) {
-  const f = { cat:p.cat, grade:p.grade, vibe:p.vibe, moment:p.moment, exact:p.exact,
+  const f = { cat:p.cat, grade:("grade" in p ? p.grade : defaultBand()),
+              vibe:p.vibe, moment:p.moment, exact:p.exact,
               q:p.q, fav:p.fav === "1", coll:p.coll };
   const results = filterActivities(f);
   const c = f.cat ? cat(f.cat) : null;

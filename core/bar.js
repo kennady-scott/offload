@@ -53,6 +53,16 @@
 
   var CLASSES = [];
 
+  /* Grade bands the teacher works in. Asked once, then every tool pre-applies it
+     instead of making them pick again per tool per visit. Vocabulary matches the
+     tags already in Before the Bell and Bellringers — do not invent new ids. */
+  var GRADE_BANDS = [
+    { id: "k2",  label: "K\u20132" },
+    { id: "35",  label: "3\u20135" },
+    { id: "68",  label: "6\u20138" },
+    { id: "912", label: "9\u201312" }
+  ];
+
   function read(k, fallback) {
     try { var v = localStorage.getItem(NS + k); return v === null ? fallback : JSON.parse(v); }
     catch (e) { return fallback; }
@@ -79,6 +89,8 @@
   }
 
   var user     = null;                        // set from the session; anonymous is normal
+  var bands    = read("gradeBands", []);
+  var bandsAsked = read("gradeAsked", false);
   var classId  = read("classId", null);
   var handlers = [];
   loadClasses();
@@ -88,7 +100,7 @@
     return null;
   }
   function emit() {
-    var payload = { user: user, klass: currentClass() };
+    var payload = { user: user, klass: currentClass(), gradeBands: bands.slice() };
     handlers.forEach(function (fn) { try { fn(payload); } catch (e) { console.error(e); } });
   }
 
@@ -283,9 +295,13 @@
   var CSS = `
     :host{ all:initial }
     *{ box-sizing:border-box }
-    .bar{
+    /* Tokens live on :host, not .bar — the sign-in and grade sheets are SIBLINGS of
+       .bar, so anything scoped to .bar left their var() borders silently invalid. */
+    :host{
       --ob-ink:#14213D; --ob-ink2:#3C4C6B; --ob-ink3:#7B87A0;
       --ob-line:rgba(20,33,61,.13); --ob-yellow:#FFD44D; --ob-blue:#3567E8;
+    }
+    .bar{
       font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
       font-size:13px; line-height:1.4; color:var(--ob-ink);
       background:#fff; border-bottom:1.5px solid var(--ob-line);
@@ -373,6 +389,11 @@
     .sheet .msg.ok{ background:#EAF7EE; color:#256B45 }
     .sheet .msg.bad{ background:#FFECEF; color:#A32744 }
     .sheet .fine{ margin:14px 0 0; font-size:11.5px; color:var(--ob-ink3); line-height:1.5 }
+    .bandrow{ display:flex; gap:8px; flex-wrap:wrap }
+    .band{ font-size:14px; font-weight:600; padding:10px 16px; border-radius:10px;
+           border:1.5px solid var(--ob-line); background:#fff }
+    .band:hover{ border-color:rgba(20,33,61,.3) }
+    .band.on{ background:var(--ob-ink); color:#fff; border-color:var(--ob-ink) }
 
     @media (max-width:620px){
       .label .sub{ display:none }
@@ -400,13 +421,21 @@
            '<span class="label">' + k.period + ' <span class="sub">· ' + k.name + '</span></span>' + CARET;
   }
 
+  function bandLabels() {
+    return GRADE_BANDS.filter(function (g) { return bands.indexOf(g.id) > -1; })
+                      .map(function (g) { return g.label; }).join(", ");
+  }
+
   function classMenuInner() {
     if (!CLASSES.length) {
       return '<div class="mhead">Your classes</div>' +
         '<div style="padding:4px 10px 10px;font-size:12.5px;color:var(--ob-ink3);line-height:1.5">' +
         'Nothing here yet. Set them up once and every tool knows your periods, ' +
         'your students, and your routines.</div>' +
-        '<a class="item" href="/classes/"><span class="t"><b>Add your classes</b></span></a>';
+        '<a class="item" href="/classes/"><span class="t"><b>Add your classes</b></span></a>' +
+        '<div class="sep"></div>' +
+        '<button class="item" data-act="grades"><span class="t"><b>Grades I teach</b>' +
+          '<span>' + (bands.length ? bandLabels() : "not set") + '</span></span></button>';
     }
     var out = '<div class="mhead">Your classes</div>';
     CLASSES.forEach(function (k) {
@@ -418,6 +447,8 @@
              (k.unit ? ' · ' + k.unit : '') + '</span></span>' + TICK + '</button>';
     });
     out += '<div class="sep"></div>' +
+           '<button class="item" data-act="grades"><span class="t"><b>Grades I teach</b>' +
+             '<span>' + (bands.length ? bandLabels() : "not set") + '</span></span></button>' +
            '<a class="item" href="/classes/"><span class="t"><b>Manage classes</b></span></a>';
     return out;
   }
@@ -443,11 +474,29 @@
            '</div></div>';
   }
 
-  var sheetOpen = false, sheetState = "idle";
+  var sheetOpen = false, sheetState = "idle", sheetMode = "signin";
 
   function sheetInner() {
     if (!sheetOpen) return "";
     var body;
+    if (sheetMode === "grades") {
+      body = '<h3>What grades do you teach?</h3>' +
+        '<p>Pick any that apply. Tools will lead with activities for your grades ' +
+        'instead of asking every time. You can change it whenever.</p>' +
+        '<div class="bandrow">' +
+          GRADE_BANDS.map(function (g) {
+            return '<button class="band' + (bands.indexOf(g.id) > -1 ? " on" : "") +
+                   '" data-band="' + g.id + '">' + g.label + '</button>';
+          }).join("") +
+        '</div>' +
+        '<div class="row">' +
+          '<button class="go2" data-act="savebands">Save</button>' +
+          '<button class="cancel" data-act="closesheet">Not now</button>' +
+        '</div>' +
+        '<p class="fine">Nothing is hidden from you \u2014 anything tagged for another grade ' +
+        'still shows, just lower down.</p>';
+      return '<div class="scrim" data-act="closesheet"><div class="sheet" data-stop>' + body + '</div></div>';
+    }
     if (sheetState === "sent") {
       body = '<h3>Check your email</h3>' +
         '<p>We sent a sign-in link. Open it on any device and your classes come with you.</p>' +
@@ -506,13 +555,30 @@
       if (!was) { panel.classList.add("open"); open.setAttribute("aria-expanded", "true"); }
       return;
     }
+    var bd = e.target.closest("[data-band]");
+    if (bd) {
+      var id = bd.dataset.band, i = bands.indexOf(id);
+      if (i > -1) bands.splice(i, 1); else bands.push(id);
+      render(); return;
+    }
     var pick = e.target.closest("[data-pick]");
     if (pick) { TeacherPlate.setClass(pick.dataset.pick); closeMenus(); return; }
 
     if (e.target.closest("[data-stop]") && !e.target.closest("[data-act]")) return;
     var act = e.target.closest("[data-act]");
     if (act) {
-      if (act.dataset.act === "closesheet") { sheetOpen = false; authNote = null; render(); return; }
+      if (act.dataset.act === "closesheet") {
+        sheetOpen = false; authNote = null;
+        if (sheetMode === "grades") { bandsAsked = true; write("gradeAsked", true); }
+        render(); return;
+      }
+      if (act.dataset.act === "grades") {
+        sheetMode = "grades"; sheetOpen = true; render(); return;
+      }
+      if (act.dataset.act === "savebands") {
+        write("gradeBands", bands); bandsAsked = true; write("gradeAsked", true);
+        sheetOpen = false; render(); emit(); return;
+      }
       if (act.dataset.act === "sendlink") {
         var f = root.querySelector("#tp-email");
         TeacherPlate.sendLink(f ? f.value.trim() : "").catch(function () {});
@@ -540,6 +606,16 @@
     setClass: function (id) { classId = id; write("classId", id); render(); emit(); },
 
     /* ── class + roster CRUD ── */
+    GRADE_BANDS: GRADE_BANDS,
+    gradeBands: function () { return bands.slice(); },
+    setGradeBands: function (a) {
+      bands = (a || []).filter(function (x) {
+        return GRADE_BANDS.some(function (g) { return g.id === x; });
+      });
+      write("gradeBands", bands); bandsAsked = true; write("gradeAsked", true);
+      render(); emit();
+    },
+    askGrades: function () { sheetMode = "grades"; sheetOpen = true; render(); },
     SUPPORTS: SUPPORTS,
     COLORS: COLORS,
     isEmpty: function () { return CLASSES.length === 0; },
@@ -640,6 +716,11 @@
       document.head.appendChild(l);
     }
     emit();
+    // Asked on first visit rather than gated behind an account: the preference is
+    // useful immediately, and it syncs up whenever an account does exist.
+    if (!bands.length && !bandsAsked) {
+      setTimeout(function () { sheetMode = "grades"; sheetOpen = true; render(); }, 700);
+    }
     if (cfg()) {
       consumeRedirect();
       if (session) {
