@@ -193,6 +193,7 @@ const DECKS = [
   subtitle: "Four things appear. The class eliminates one — forever, for everyone.",
   minutes: 5, grades: ["35","68"], subjects: ["sel"], energy: "high", group: "whole",
   situations: ["talking","need-energy","finished-early"],
+  art: "img/one-has-to-go.webp",
   prompts: [
     { stem: "One has to go. Forever.", items: [ {label:"Pizza",icon:"🍕"}, {label:"Tacos",icon:"🌮"}, {label:"Burgers",icon:"🍔"}, {label:"Ice cream",icon:"🍦"} ] },
     { stem: "One has to go. Forever.", items: [ {label:"Summer",icon:"☀️"}, {label:"Fall",icon:"🍂"}, {label:"Winter",icon:"❄️"}, {label:"Spring",icon:"🌷"} ] },
@@ -215,6 +216,7 @@ const DECKS = [
   subtitle: "An indefensible claim. Sixty seconds to make us believe it anyway.",
   minutes: 10, grades: ["35","68"], subjects: ["ela"], energy: "high", group: "pairs",
   situations: ["talking","need-energy","thinking"],
+  art: "img/defend-the-ridiculous.webp",
   featured: true,
   prompts: [
     { stem: "Convince us:", big: "Homework should only be assigned at midnight." },
@@ -364,6 +366,7 @@ const DECKS = [
   subtitle: "Write the best caption for the scene. Share and vote.",
   minutes: 5, grades: ["k2","35","68"], subjects: ["ela"], energy: "medium", group: "solo",
   situations: ["finished-early","talking","switching","need-energy"],
+  art: "img/caption-this.webp",
   featured: true,
   prompts: [
     { stem: "Caption this.", scene: "🐕🕶️🛹", sub: "A dog in sunglasses on a skateboard." },
