@@ -72,12 +72,13 @@
   }
   function saveClasses() {
     write("classes", { version: 1, classes: CLASSES });
+    schedulePush();
     if (classId && !CLASSES.some(function (k) { return k.id === classId; })) {
       classId = null; write("classId", null);         // selected class was deleted
     }
   }
 
-  var user     = read("user", null);          // null = anonymous, the normal case
+  var user     = null;                        // set from the session; anonymous is normal
   var classId  = read("classId", null);
   var handlers = [];
   loadClasses();
@@ -89,6 +90,187 @@
   function emit() {
     var payload = { user: user, klass: currentClass() };
     handlers.forEach(function (fn) { try { fn(payload); } catch (e) { console.error(e); } });
+  }
+
+  /* ── accounts: config, session, sync ─────────────────────────────────────
+     Plain fetch against Supabase's REST endpoints. No CDN bundle, because this
+     file loads on every tool page and it promised no dependencies.
+
+     With no config this whole section stays dormant and Teacher Plate works
+     exactly as it does today, on localStorage. That is the normal state, not a
+     degraded one. */
+  var CFG = window.TP_CONFIG || {};
+  function cfg() { return (CFG.supabaseUrl && CFG.supabaseAnonKey) ? CFG : null; }
+
+  var session = read("session", null);
+  var authNote = null;                       // transient UI message
+
+  function api(path, opts) {
+    var c = cfg();
+    if (!c) return Promise.reject(new Error("accounts are not configured"));
+    opts = opts || {};
+    var h = { apikey: c.supabaseAnonKey, "Content-Type": "application/json" };
+    Object.keys(opts.headers || {}).forEach(function (k) { h[k] = opts.headers[k]; });
+    if (session && session.access_token && !opts.noAuth) h.Authorization = "Bearer " + session.access_token;
+    return fetch(c.supabaseUrl + path, { method: opts.method || "GET", headers: h, body: opts.body })
+      .then(function (r) {
+        if (r.status === 204) return null;
+        return r.text().then(function (t) {
+          var j = null; try { j = t ? JSON.parse(t) : null; } catch (e) {}
+          if (!r.ok) {
+            var msg = (j && (j.message || j.error_description || j.msg)) || r.status + " " + r.statusText;
+            var err = new Error(msg); err.status = r.status; err.body = j; throw err;
+          }
+          return j;
+        });
+      });
+  }
+
+  function saveSession(x) { session = x; write("session", x); }
+  function stale() { return !session || !session.expires_at || Date.now() > (session.expires_at - 60000); }
+  function adopt(d) {
+    saveSession({
+      access_token: d.access_token,
+      refresh_token: d.refresh_token || (session && session.refresh_token) || null,
+      expires_at: Date.now() + ((d.expires_in || 3600) * 1000),
+      user: d.user ? { id: d.user.id, email: d.user.email } : (session && session.user) || null
+    });
+  }
+  function refresh() {
+    if (!session || !session.refresh_token) return Promise.reject(new Error("signed out"));
+    return api("/auth/v1/token?grant_type=refresh_token", {
+      method: "POST", noAuth: true, body: JSON.stringify({ refresh_token: session.refresh_token })
+    }).then(function (d) { adopt(d); });
+  }
+  function authed(fn) {
+    if (!session) return Promise.reject(new Error("signed out"));
+    return (stale() ? refresh() : Promise.resolve()).then(fn);
+  }
+  function userFrom() {
+    if (!session || !session.user) return null;
+    var e = session.user.email || "";
+    var handle = e.split("@")[0].replace(/[._+-]+/g, " ").trim();
+    var name = handle.split(" ").filter(Boolean).map(function (w) {
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(" ") || e || "Teacher";
+    var initials = name.split(" ").filter(Boolean).slice(0, 2).map(function (w) {
+      return w.charAt(0).toUpperCase();
+    }).join("") || "T";
+    return { name: name, initials: initials, email: e };
+  }
+
+  /* ── sync. One teacher, one roster: whole-collection last-write-wins is
+     correct here and far less to get wrong than per-row diffing. ── */
+  function toRow(k, i) {
+    return { teacher_id: session.user.id, local_id: k.id, period: k.period || "",
+             subject: k.name || "", grade: k.grade || "", meets_at: k.time || "",
+             unit: k.unit || "", notes: k.notes || "", color: k.color || "", sort: i };
+  }
+  function fromRows(cs, ss) {
+    var byClass = {};
+    (ss || []).forEach(function (x) { (byClass[x.class_id] = byClass[x.class_id] || []).push(x); });
+    return (cs || []).map(function (c) {
+      return { id: c.local_id, period: c.period || "", name: c.subject || "", grade: c.grade || "",
+               time: c.meets_at || "", unit: c.unit || "", notes: c.notes || "", color: c.color || "",
+               students: (byClass[c.id] || []).map(function (x) {
+                 return { id: x.local_id, first: x.first || "", last: x.last || "",
+                          supports: x.supports || [], note: x.note || "" };
+               }) };
+    });
+  }
+  function pull() {
+    return authed(function () {
+      return Promise.all([
+        api("/rest/v1/classes?select=*&order=sort.asc"),
+        api("/rest/v1/students?select=*&order=sort.asc")
+      ]).then(function (r) { return fromRows(r[0], r[1]); });
+    });
+  }
+  function push() {
+    return authed(function () {
+      var rows = CLASSES.map(toRow);
+      var keep = CLASSES.map(function (k) { return k.id; });
+      var up = rows.length
+        ? api("/rest/v1/classes?on_conflict=teacher_id,local_id", {
+            method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+            body: JSON.stringify(rows) })
+        : Promise.resolve([]);
+      return up.then(function (saved) {
+        var q = keep.length ? "local_id=not.in.(" + keep.join(",") + ")" : "local_id=neq.__none__";
+        return api("/rest/v1/classes?" + q, { method: "DELETE" }).then(function () { return saved; });
+      }).then(function (saved) {
+        var rowId = {};
+        (saved || []).forEach(function (r) { rowId[r.local_id] = r.id; });
+        var sp = [];
+        CLASSES.forEach(function (k) {
+          if (!rowId[k.id]) return;
+          (k.students || []).forEach(function (st, si) {
+            sp.push({ teacher_id: session.user.id, class_id: rowId[k.id], local_id: st.id,
+                      first: st.first || "", last: st.last || "", supports: st.supports || [],
+                      note: st.note || "", sort: si });
+          });
+        });
+        var keepS = sp.map(function (x) { return x.local_id; });
+        var upS = sp.length
+          ? api("/rest/v1/students?on_conflict=teacher_id,local_id", {
+              method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+              body: JSON.stringify(sp) })
+          : Promise.resolve(null);
+        return upS.then(function () {
+          var q2 = keepS.length ? "local_id=not.in.(" + keepS.join(",") + ")" : "local_id=neq.__none__";
+          return api("/rest/v1/students?" + q2, { method: "DELETE" });
+        });
+      });
+    });
+  }
+  var pushTimer;
+  function schedulePush() {
+    if (!session || !cfg()) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () {
+      push().catch(function (e) { console.warn("[TeacherPlate] sync failed:", e.message); });
+    }, 900);
+  }
+  /* First sign-in on a machine that already has local classes: the account wins
+     for anything it already knows, and local-only classes are kept and uploaded.
+     Never silently discard what the teacher typed before signing in. */
+  function mergeUp() {
+    var local = CLASSES.slice();
+    return pull().then(function (remote) {
+      var seen = {};
+      remote.forEach(function (k) { seen[k.id] = true; });
+      local.forEach(function (k) { if (!seen[k.id]) remote.push(k); });
+      CLASSES = remote;
+      write("classes", { version: 1, classes: CLASSES });
+      return push();
+    });
+  }
+
+  /* Magic-link tokens come back in the URL fragment. They are only ever allowed
+     to land on the hub, because tool pages use the fragment for routing
+     (Bellringers is #/library) and would fight over it. */
+  function consumeRedirect() {
+    if (!location.hash || location.hash.indexOf("access_token=") < 0) return;
+    var q = {};
+    location.hash.replace(/^#/, "").split("&").forEach(function (kv) {
+      var i = kv.indexOf("="); if (i > 0) q[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
+    });
+    if (!q.access_token) return;
+    adopt({ access_token: q.access_token, refresh_token: q.refresh_token,
+            expires_in: parseInt(q.expires_in || "3600", 10) });
+    history.replaceState(null, "", location.pathname + location.search);
+    api("/auth/v1/user").then(function (u) {
+      saveSession({ access_token: session.access_token, refresh_token: session.refresh_token,
+                    expires_at: session.expires_at, user: { id: u.id, email: u.email } });
+      user = userFrom(); render(); emit();
+      return mergeUp();
+    }).then(function () {
+      render(); emit();
+      var from = new URLSearchParams(location.search).get("from");
+      if (from && from.charAt(0) === "/") location.replace(from);
+    }).catch(function (e) {
+      authNote = "Sign-in didn't finish: " + e.message; render();
+    });
   }
 
   /* ── shell ───────────────────────────────────────────────────────────── */
@@ -114,7 +296,7 @@
     a{ color:inherit; text-decoration:none }
 
     .home{ display:flex; align-items:center; gap:7px; padding:5px 8px 5px 4px; border-radius:8px;
-           transition:background .15s }
+           transition:background .15s; flex:none }
     .home:hover{ background:rgba(20,33,61,.05) }
     .home .chev{ width:14px; height:14px; stroke:var(--ob-ink3); fill:none; stroke-width:2;
                  stroke-linecap:round; stroke-linejoin:round; flex:none }
@@ -124,10 +306,12 @@
 
     .dot{ width:3px; height:3px; border-radius:50%; background:var(--ob-ink3); opacity:.5; flex:none }
 
-    .wrap{ position:relative }
+    /* min-width:0 on both: flex items default to min-width:auto, which stops
+       .label's ellipsis engaging and shoves .right off the right edge on a phone. */
+    .wrap{ position:relative; min-width:0 }
     .chip{ display:flex; align-items:center; gap:8px; padding:6px 9px; border-radius:9px;
            border:1.5px solid var(--ob-line); transition:border-color .15s,background .15s;
-           max-width:280px }
+           max-width:280px; min-width:0 }
     .chip:hover{ background:rgba(20,33,61,.03); border-color:rgba(20,33,61,.24) }
     .chip[aria-expanded="true"]{ border-color:var(--ob-blue); background:rgba(53,103,232,.05) }
     .swatch{ width:8px; height:8px; border-radius:50%; flex:none; background:var(--ob-ink3) }
@@ -156,7 +340,7 @@
     .item[aria-checked="true"] .tick{ opacity:1 }
     .sep{ height:1px; background:var(--ob-line); margin:6px 8px }
 
-    .right{ margin-left:auto; display:flex; align-items:center; gap:8px }
+    .right{ margin-left:auto; display:flex; align-items:center; gap:8px; flex:none }
     .ghost{ padding:7px 13px; border-radius:9px; border:1.5px solid var(--ob-line); font-weight:600;
             transition:border-color .15s,background .15s }
     .ghost:hover{ border-color:var(--ob-ink); background:rgba(20,33,61,.04) }
@@ -169,10 +353,39 @@
            font-style:normal; font-size:10.5px; font-weight:700; letter-spacing:.03em;
            display:flex; align-items:center; justify-content:center; flex:none }
 
+    .scrim{ position:fixed; inset:0; background:rgba(20,33,61,.42); z-index:50;
+            display:flex; align-items:center; justify-content:center; padding:20px }
+    .sheet{ background:#fff; border-radius:16px; width:100%; max-width:392px; padding:22px 22px 20px;
+            box-shadow:0 24px 60px -18px rgba(20,33,61,.55) }
+    .sheet h3{ margin:0 0 5px; font-size:18px; font-weight:700; letter-spacing:-.015em }
+    .sheet p{ margin:0 0 15px; font-size:13.5px; color:var(--ob-ink2); line-height:1.55 }
+    .sheet input{ font:inherit; font-size:15px; padding:11px 12px; border:1.5px solid var(--ob-line);
+                  border-radius:10px; width:100%; background:#FCFCFD; color:var(--ob-ink) }
+    .sheet input:focus{ outline:none; border-color:var(--ob-blue); background:#fff }
+    .sheet .row{ display:flex; gap:9px; margin-top:13px }
+    .sheet .go2{ background:var(--ob-ink); color:#fff; border-radius:10px; padding:11px 17px;
+                 font-weight:600; font-size:14.5px; flex:1 }
+    .sheet .go2:hover{ background:#1B2C50 }
+    .sheet .cancel{ border:1.5px solid var(--ob-line); border-radius:10px; padding:11px 15px;
+                    font-weight:600; font-size:14.5px }
+    .sheet .cancel:hover{ border-color:var(--ob-ink) }
+    .sheet .msg{ margin:13px 0 0; font-size:13px; line-height:1.55; padding:10px 12px; border-radius:9px }
+    .sheet .msg.ok{ background:#EAF7EE; color:#256B45 }
+    .sheet .msg.bad{ background:#FFECEF; color:#A32744 }
+    .sheet .fine{ margin:14px 0 0; font-size:11.5px; color:var(--ob-ink3); line-height:1.5 }
+
     @media (max-width:620px){
       .label .sub{ display:none }
       .who{ display:none }
       .chip{ max-width:160px }
+      .menu{ max-width:calc(100vw - 24px) }
+    }
+    @media (max-width:480px){
+      /* Drop the wordmark, keep the mark — it is still the link home, and the
+         class chip is the control that actually matters on a phone. */
+      .word{ display:none }
+      .bar{ padding:0 12px; gap:8px }
+      .chip{ max-width:none }
     }
   `;
 
@@ -211,6 +424,8 @@
 
   function rightInner() {
     if (!user) {
+      // No project configured yet: don't offer a sign-in that cannot work.
+      if (!cfg()) return '<span class="who">Using Teacher Plate without an account</span>';
       return '<span class="who">Using Teacher Plate without an account</span>' +
              '<button class="ghost" data-act="signin">Sign in</button>';
     }
@@ -226,6 +441,33 @@
              '<div class="sep"></div>' +
              '<button class="item" data-act="signout"><span class="t"><b>Sign out</b></span></button>' +
            '</div></div>';
+  }
+
+  var sheetOpen = false, sheetState = "idle";
+
+  function sheetInner() {
+    if (!sheetOpen) return "";
+    var body;
+    if (sheetState === "sent") {
+      body = '<h3>Check your email</h3>' +
+        '<p>We sent a sign-in link. Open it on any device and your classes come with you.</p>' +
+        '<div class="row"><button class="cancel" data-act="closesheet" style="flex:1">Done</button></div>';
+    } else {
+      body = '<h3>Sign in to Teacher Plate</h3>' +
+        '<p>Your classes and students follow you from school to home, and can&rsquo;t be lost by ' +
+        'clearing your browser. No password to remember.</p>' +
+        '<input id="tp-email" type="email" placeholder="you@school.org" autocomplete="email" ' +
+          (sheetState === "sending" ? "disabled" : "") + '>' +
+        (authNote ? '<p class="msg bad">' + authNote + '</p>' : '') +
+        '<div class="row">' +
+          '<button class="go2" data-act="sendlink"' + (sheetState === "sending" ? " disabled" : "") + '>' +
+            (sheetState === "sending" ? "Sending…" : "Email me a link") + '</button>' +
+          '<button class="cancel" data-act="closesheet">Not now</button>' +
+        '</div>' +
+        '<p class="fine">Everything keeps working without an account. Signing in only adds ' +
+        'memory across devices.</p>';
+    }
+    return '<div class="scrim" data-act="closesheet"><div class="sheet" data-stop>' + body + '</div></div>';
   }
 
   function render() {
@@ -244,7 +486,7 @@
           '<div class="menu" data-panel="class" role="menu">' + classMenuInner() + '</div>' +
         '</div>' +
         '<div class="right">' + rightInner() + '</div>' +
-      '</div>';
+      '</div>' + sheetInner();
   }
 
   /* ── interaction ─────────────────────────────────────────────────────── */
@@ -267,8 +509,15 @@
     var pick = e.target.closest("[data-pick]");
     if (pick) { TeacherPlate.setClass(pick.dataset.pick); closeMenus(); return; }
 
+    if (e.target.closest("[data-stop]") && !e.target.closest("[data-act]")) return;
     var act = e.target.closest("[data-act]");
     if (act) {
+      if (act.dataset.act === "closesheet") { sheetOpen = false; authNote = null; render(); return; }
+      if (act.dataset.act === "sendlink") {
+        var f = root.querySelector("#tp-email");
+        TeacherPlate.sendLink(f ? f.value.trim() : "").catch(function () {});
+        return;
+      }
       if (act.dataset.act === "signin")  TeacherPlate.signIn();
       if (act.dataset.act === "signout") TeacherPlate.signOut();
       closeMenus();
@@ -344,16 +593,44 @@
     },
     onChange: function (fn) { handlers.push(fn); return function () {
       handlers = handlers.filter(function (h) { return h !== fn; }); }; },
-    // Stubs until Supabase auth lands. Same signatures, so tools need no changes.
-    signIn:  function () {
-      user = { name: "Kennady", initials: "KS" };
-      write("user", user); render(); emit();
+    signIn: function () {
+      if (!cfg()) { console.warn("[TeacherPlate] accounts are not configured yet"); return; }
+      authNote = null; sheetOpen = true; sheetState = "idle"; render();
+      var el = root.getElementById ? null : root.querySelector("#tp-email");
+      if (el) el.focus();
     },
-    signOut: function () { user = null; write("user", null); render(); emit(); }
+    sendLink: function (email) {
+      var c = cfg();
+      if (!c) return Promise.reject(new Error("accounts are not configured"));
+      if (!email || email.indexOf("@") < 1) {
+        authNote = "That doesn't look like an email address."; sheetState = "idle"; render();
+        return Promise.reject(new Error("bad email"));
+      }
+      sheetState = "sending"; authNote = null; render();
+      var back = location.pathname + location.search;
+      var to = location.origin + "/app.html?from=" + encodeURIComponent(back);
+      return api("/auth/v1/otp?redirect_to=" + encodeURIComponent(to), {
+        method: "POST", noAuth: true,
+        body: JSON.stringify({ email: email, create_user: true })
+      }).then(function () { sheetState = "sent"; render(); })
+        .catch(function (e) {
+          authNote = e.message || "Could not send the link."; sheetState = "idle"; render(); throw e;
+        });
+    },
+    signOut: function () {
+      if (session) { api("/auth/v1/logout", { method: "POST" }).catch(function () {}); }
+      saveSession(null); user = null; render(); emit();
+    },
+    refreshFromAccount: function () {
+      return pull().then(function (remote) {
+        CLASSES = remote; write("classes", { version: 1, classes: CLASSES }); render(); emit();
+      });
+    }
   };
 
   /* ── mount ───────────────────────────────────────────────────────────── */
   function mount() {
+    user = userFrom();
     render();
     document.body.insertBefore(host, document.body.firstChild);
     if (!document.querySelector('link[data-tp-font]')) {
@@ -363,6 +640,16 @@
       document.head.appendChild(l);
     }
     emit();
+    if (cfg()) {
+      consumeRedirect();
+      if (session) {
+        pull().then(function (remote) {
+          if (remote.length || !CLASSES.length) {
+            CLASSES = remote; write("classes", { version: 1, classes: CLASSES }); render(); emit();
+          } else { return push(); }        // account is empty, this device has classes
+        }).catch(function (e) { console.warn("[TeacherPlate] could not load your account:", e.message); });
+      }
+    }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount);
   else mount();

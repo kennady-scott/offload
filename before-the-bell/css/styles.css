@@ -120,7 +120,7 @@ p{margin:0}
 /* app preview */
 .preview{position:relative}
 .preview-win{
-  display:grid;grid-template-columns:84px 1fr;background:var(--paper);
+  display:grid;grid-template-columns:84px minmax(0,1fr);background:var(--paper);
   border:1px solid var(--rule);border-radius:var(--r-lg);overflow:hidden;
   box-shadow:var(--shadow-lg);
 }
@@ -134,7 +134,7 @@ p{margin:0}
 .preview-body{padding:20px 22px 22px}
 .preview-hi{font-size:.92rem;font-weight:600;margin-bottom:2px}
 .preview-q{font-size:.8rem;color:var(--slate);margin-bottom:14px}
-.preview-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.preview-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
 .pcard{
   border-radius:12px;padding:11px 11px 12px;min-height:106px;
   display:flex;flex-direction:column;justify-content:space-between;
