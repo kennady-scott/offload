@@ -455,8 +455,9 @@ function cardHTML(deck){
   const art = artFor(deck);
   return `
     <div class="card" data-deck="${deck.id}" role="button" tabindex="0">
-      <div class="card-art art-${f.tint}${art ? " has-img" : ""}">
-        ${art ? `<img class="card-img" src="${art}" alt="" loading="lazy" decoding="async">` : f.icon}
+      <div class="card-art art-${f.tint}${art ? " has-img" : " card-live"}">
+        ${art ? `<img class="card-img" src="${art}" alt="" loading="lazy" decoding="async">`
+              : renderStage(deck, deck.prompts[0], 0)}
         <button class="fav ${on ? "on" : ""}" data-fav="${deck.id}" aria-label="Favorite">${on ? "♥" : "♡"}</button>
       </div>
       <div class="card-body">
