@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5 Minutes Before the Bell — classroom-ready activities for the awkward five minutes</title>
+<meta name="description" content="You don’t need another curriculum. You need something to do until the bell rings. 98 no-prep, classroom-ready activities for K–8 — 1, 2, 3 or 5 minutes, with a built-in timer and a Project Mode for the board.">
+<meta name="theme-color" content="#11293F">
+
+<meta property="og:title" content="5 Minutes Before the Bell">
+<meta property="og:description" content="Turn the awkward five minutes into something worth doing. 98 no-prep classroom activities for K–8.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css?v=5">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='52' r='34' fill='none' stroke='%2311293F' stroke-width='8'/><path d='M50 34v20l13 8' fill='none' stroke='%2311293F' stroke-width='8' stroke-linecap='round'/><path d='M22 22l10-10M78 22L68 12' stroke='%23E9A62C' stroke-width='8' stroke-linecap='round'/></svg>">
+</head>
+<body>
+<script src="/offload-core/offload-bar.js" data-hub="/app.html"></script>
+
+<header class="site-header">
+  <div class="wrap header-in">
+    <a class="logo" href="#/" aria-label="5 Minutes Before the Bell — home">
+      <svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="54" r="33" fill="#fff" stroke="#11293F" stroke-width="7"/>
+        <path d="M50 36v19l12 7" fill="none" stroke="#11293F" stroke-width="7" stroke-linecap="round"/>
+        <path d="M24 24 14 14M76 24 86 14" stroke="#E9A62C" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="50" cy="54" r="4" fill="#E9A62C"/>
+      </svg>
+      <span class="logo-text">
+        <b>5 Minutes</b>
+        <span>Before the Bell</span>
+      </span>
+    </a>
+
+    <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+
+    <nav class="nav" id="nav">
+      <a href="#/browse" data-route="browse">Browse</a>
+      <a href="#/favorites" data-route="favorites">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+        Favorites <span class="count" id="favCount" hidden>0</span>
+      </a>
+      <a href="#/browse?grade=k2" data-route="grade">By Grade</a>
+      <a href="#/dashboard" data-route="dashboard">My Stuff</a>
+      <button class="btn btn-primary btn-sm" data-open-finder>I’ve Got 5 Minutes</button>
+    </nav>
+  </div>
+</header>
+
+<main id="view" tabindex="-1"></main>
+
+<footer class="site-footer">
+  <div class="wrap footer-in">
+    <div><strong>5 Minutes Before the Bell</strong> — 98 no-prep activities for K–8. <em style="opacity:.8">You don’t need another curriculum. You need something to do until the bell rings.</em></div>
+    <div><a href="#/browse">Browse all</a> · <a href="#/favorites">Favorites</a> · <a href="#/dashboard">My Stuff</a> · <a href="#/">Home</a></div>
+  </div>
+</footer>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Activity finder"></div>
+<div class="project" id="project" role="dialog" aria-modal="true" aria-label="Project mode"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/activities.js?v=5"></script>
+<script src="js/app.js?v=5"></script>
+</body>
+</html>

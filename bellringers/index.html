@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bellringers — Start class strong. Fill the weird five minutes.</title>
+<meta name="description" content="Fun, engaging ways to start class, fill awkward transition times, and get students thinking fast. No downloads. No prep. No login required.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔔</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<script src="/offload-core/offload-bar.js" data-hub="/app.html"></script>
+
+<header class="site-header">
+  <a class="brand" href="#/" aria-label="Bellringers home">
+    <span class="brand-bell" aria-hidden="true">🔔</span>
+    <span class="brand-word">Bellringers</span>
+  </a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="#/" data-nav="home">Home</a>
+    <a href="#/library" data-nav="library">Activity Library</a>
+    <a href="#/bellringer-mode" data-nav="bellringer-mode">Bellringer Mode</a>
+    <a href="#/favorites" data-nav="favorites">Favorites <span class="heart" aria-hidden="true">♡</span><span class="fav-count" id="navFavCount" hidden></span></a>
+  </nav>
+  <div class="header-right">
+    <span class="no-login" title="Everything here works without an account. Favorites are saved in this browser.">No login required</span>
+  </div>
+</header>
+
+<main id="view"></main>
+
+<!-- ───────────────────────── PROJECTOR PLAYER ───────────────────────── -->
+<div class="player" id="player" hidden aria-modal="true" role="dialog" aria-label="Activity display">
+
+  <svg class="deco deco-loop" viewBox="0 0 200 110" fill="none" aria-hidden="true">
+    <path d="M4 92C34 40 78 8 118 22" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 14"/>
+    <path d="M118 22c34 12 22 62-10 58S82 30 128 20s62 24 68 52" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 14"/>
+  </svg>
+  <svg class="deco deco-squiggle" viewBox="0 0 160 60" fill="none" aria-hidden="true">
+    <path d="M4 34c14-22 30 22 46 0s30 22 46 0 30 18 44 6" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="18" cy="10" r="6" stroke="currentColor" stroke-width="4"/>
+  </svg>
+
+  <div class="player-mark"><span class="brand-bell">🔔</span><span class="brand-word">Bellringers</span></div>
+
+  <div class="player-stage" id="playerStage"></div>
+
+  <div class="player-foot">
+    <div class="player-direction" id="playerDirection"></div>
+    <div class="player-chips" id="playerChips"></div>
+  </div>
+
+  <div class="player-seq" id="playerSeq" hidden></div>
+
+  <div class="player-bar">
+    <div class="player-bar-left">
+      <button class="pbtn pbtn-exit" id="btnExit" title="Close (Esc)">✕</button>
+      <span class="player-title" id="playerTitle"></span>
+    </div>
+    <div class="player-bar-right">
+      <button class="pbtn pbtn-reveal" id="btnReveal" hidden>Reveal <kbd>R</kbd></button>
+      <button class="pbtn pbtn-primary" id="btnNext">Next <kbd>→</kbd></button>
+      <button class="pbtn" id="btnTimer">Timer <kbd>T</kbd></button>
+      <button class="pbtn" id="btnRandom" title="Jump to a random Bellringer">Randomize</button>
+      <button class="pbtn" id="btnFull">⤢ Full Screen <kbd>F</kbd></button>
+      <button class="pbtn" id="btnNotes">Teacher Notes <kbd>N</kbd></button>
+    </div>
+  </div>
+
+  <div class="timer-chip" id="timerChip" hidden>
+    <span class="timer-clock" id="timerClock">0:00</span>
+    <button class="timer-x" id="timerStop" title="Stop timer">✕</button>
+  </div>
+
+  <div class="notes-panel" id="notesPanel" hidden>
+    <button class="notes-close" id="notesClose">✕</button>
+    <div id="notesBody"></div>
+  </div>
+</div>
+
+<script src="js/formats.js"></script>
+<script src="js/decks.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
