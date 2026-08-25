@@ -83,6 +83,36 @@ create policy students_update on public.students for update
 create policy students_delete on public.students for delete
   using (teacher_id = auth.uid());
 
+-- ─────────────────────── class_days (Catch Me Up) ──────────────────────
+-- NOT YET USED BY THE CLIENT. Catch Me Up currently stores its log in
+-- localStorage under tp.v1.catchMeUp. Run this before wiring the sync — never
+-- ship a query against a column whose migration hasn't run.
+create table if not exists public.class_days (
+  id          uuid primary key default gen_random_uuid(),
+  teacher_id  uuid not null references auth.users(id) on delete cascade,
+  class_id    uuid not null references public.classes(id) on delete cascade,
+  on_date     date not null,
+  learned     text default '',
+  todo        text default '',
+  skip        text default '',
+  ask         text default '',
+  due         text default '',
+  absent      text[] default '{}',
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now(),
+  unique (teacher_id, class_id, on_date)
+);
+create index if not exists class_days_teacher_idx on public.class_days (teacher_id);
+alter table public.class_days enable row level security;
+drop policy if exists class_days_select on public.class_days;
+drop policy if exists class_days_insert on public.class_days;
+drop policy if exists class_days_update on public.class_days;
+drop policy if exists class_days_delete on public.class_days;
+create policy class_days_select on public.class_days for select using (teacher_id = auth.uid());
+create policy class_days_insert on public.class_days for insert with check (teacher_id = auth.uid());
+create policy class_days_update on public.class_days for update using (teacher_id = auth.uid()) with check (teacher_id = auth.uid());
+create policy class_days_delete on public.class_days for delete using (teacher_id = auth.uid());
+
 -- ─────────────────────────── grants ────────────────────────────────────
 -- RLS decides WHICH ROWS a role may see. GRANT decides whether the role may
 -- touch the table at all. Both are required — policies alone give 42501.
@@ -94,6 +124,7 @@ create policy students_delete on public.students for delete
 grant usage on schema public to authenticated;
 grant select, insert, update, delete on public.classes  to authenticated;
 grant select, insert, update, delete on public.students to authenticated;
+grant select, insert, update, delete on public.class_days to authenticated;
 
 -- ─────────────────────────── updated_at ────────────────────────────────
 create or replace function public.touch_updated_at() returns trigger
