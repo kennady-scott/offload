@@ -6,7 +6,7 @@
    supabase/schema.sql is what actually protects a teacher's roster. Never put a
    service_role key here. */
 window.TP_CONFIG = {
-  supabaseUrl: "",     // https://xxxxxxxx.supabase.co
+  supabaseUrl: "https://oxgmscejduvplgapoaib.supabase.co",     // https://xxxxxxxx.supabase.co
   supabaseAnonKey: "", // eyJ... (anon / publishable key, never service_role)
 
   // "magiclink" needs no external setup. "google" needs a Google Cloud OAuth
