@@ -18,7 +18,40 @@ Everything already persists in `localStorage`. The account moves that store to t
 survives a different machine and a cleared browser. That is the whole difference — it is
 durability, not features.
 
-## The open blocker: how people actually sign in
+## Google sign-in — CODE IS READY, waiting on a Google Cloud client
+Everything on this side is built and tested. `config.js` currently says
+`authMethods: ["magiclink"]`; add `"google"` and the button appears. Verified for all three
+configurations: magic-link only, both (with an "or" divider), and Google only (no email field at all).
+
+**The one step that trips people up: the redirect URI goes to SUPABASE, not to teacherplate.com.**
+
+### In console.cloud.google.com
+1. New project — call it Teacher Plate.
+2. **APIs & Services → OAuth consent screen** → **External**. App name "Teacher Plate", your email
+   for both support and developer contact.
+3. **Scopes: only `email`, `profile`, `openid`.** These are non-sensitive, which is what keeps you
+   out of Google's verification review. Do not add anything else.
+4. When it's working, click **Publish app**. Left in "Testing" it only allows 100 manually-added
+   users.
+5. **Credentials → Create credentials → OAuth client ID → Web application.**
+   - Authorized JavaScript origin: `https://teacherplate.com`
+   - Authorized redirect URI: **`https://oxgmscejduvplgapoaib.supabase.co/auth/v1/callback`**
+     ← Supabase's callback. Not your domain. This is the mistake everyone makes.
+6. Copy the **Client ID** and **Client secret**.
+
+### In Supabase
+7. **Authentication → Providers → Google** → enable, paste the ID and secret, save.
+8. Confirm **Authentication → URL Configuration** still lists `https://teacherplate.com/app.html`
+   and `http://localhost:4212/app.html`.
+
+### Then here
+9. In `core/config.js`: `authMethods: ["google", "magiclink"]` — or just `["google"]` to drop email
+   entirely and stop needing SMTP at all.
+10. Bump `config.js?v=` and `bar.js?v=` on every page.
+
+Send me the Client ID when you have it and I'll do steps 9–10 and test the round trip.
+
+## The magic-link blocker (irrelevant if you go Google-only)
 Magic link is wired and the request shape is verified, but **Supabase's built-in mail is about two
 messages an hour and lands in spam**, so it works for testing and will fail for real teachers.
 Two ways out:

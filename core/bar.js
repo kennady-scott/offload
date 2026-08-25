@@ -389,6 +389,13 @@
     .sheet .msg.ok{ background:#EAF7EE; color:#256B45 }
     .sheet .msg.bad{ background:#FFECEF; color:#A32744 }
     .sheet .fine{ margin:14px 0 0; font-size:11.5px; color:var(--ob-ink3); line-height:1.5 }
+    .google{ display:flex; align-items:center; justify-content:center; gap:10px; width:100%;
+             padding:11px 14px; border:1.5px solid var(--ob-line); border-radius:10px;
+             font-weight:600; font-size:14.5px; background:#fff }
+    .google:hover{ border-color:var(--ob-ink); background:rgba(20,33,61,.03) }
+    .orline{ display:flex; align-items:center; gap:10px; margin:13px 0 12px;
+             font-size:12px; color:var(--ob-ink3) }
+    .orline::before,.orline::after{ content:""; flex:1; height:1px; background:var(--ob-line) }
     .bandrow{ display:flex; gap:8px; flex-wrap:wrap }
     .band{ font-size:14px; font-weight:600; padding:10px 16px; border-radius:10px;
            border:1.5px solid var(--ob-line); background:#fff }
@@ -410,6 +417,13 @@
     }
   `;
 
+  var GOOGLE_MARK =
+    '<svg viewBox="0 0 18 18" width="17" height="17" aria-hidden="true">' +
+    '<path fill="#4285F4" d="M17.6 9.2c0-.6-.05-1.2-.16-1.7H9v3.3h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/>' +
+    '<path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.54-1.84.86-3.1.86-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"/>' +
+    '<path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8l3-2.3z"/>' +
+    '<path fill="#EA4335" d="M9 3.6c1.32 0 2.5.45 3.44 1.35l2.58-2.59A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/>' +
+    '</svg>';
   var CARET = '<svg class="caret" viewBox="0 0 12 12"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
   var TICK  = '<svg class="tick" viewBox="0 0 14 14"><path d="M2.2 7.4 5.4 10.4 11.8 3.6"/></svg>';
 
@@ -502,16 +516,27 @@
         '<p>We sent a sign-in link. Open it on any device and your classes come with you.</p>' +
         '<div class="row"><button class="cancel" data-act="closesheet" style="flex:1">Done</button></div>';
     } else {
+      var methods = CFG.authMethods || ["magiclink"];
+      var hasGoogle = methods.indexOf("google") > -1;
+      var hasLink   = methods.indexOf("magiclink") > -1;
       body = '<h3>Sign in to Teacher Plate</h3>' +
         '<p>Free, and optional. Your classes, grades and saved work follow you from school ' +
         'to home instead of living in one browser. No password to remember.</p>' +
-        '<input id="tp-email" type="email" placeholder="you@school.org" autocomplete="email" ' +
-          (sheetState === "sending" ? "disabled" : "") + '>' +
+        (hasGoogle
+          ? '<button class="google" data-act="google">' + GOOGLE_MARK + 'Continue with Google</button>' +
+            (hasLink ? '<div class="orline"><span>or</span></div>' : '')
+          : '') +
+        (hasLink
+          ? '<input id="tp-email" type="email" placeholder="you@school.org" autocomplete="email" ' +
+              (sheetState === "sending" ? "disabled" : "") + '>'
+          : '') +
         (authNote ? '<p class="msg bad">' + authNote + '</p>' : '') +
         '<div class="row">' +
-          '<button class="go2" data-act="sendlink"' + (sheetState === "sending" ? " disabled" : "") + '>' +
-            (sheetState === "sending" ? "Sending…" : "Email me a link") + '</button>' +
-          '<button class="cancel" data-act="closesheet">Not now</button>' +
+          (hasLink
+            ? '<button class="go2" data-act="sendlink"' + (sheetState === "sending" ? " disabled" : "") + '>' +
+                (sheetState === "sending" ? "Sending…" : "Email me a link") + '</button>'
+            : '') +
+          '<button class="cancel" data-act="closesheet"' + (hasLink ? '' : ' style="flex:1"') + '>Not now</button>' +
         '</div>' +
         '<p class="fine">Everything keeps working without an account. Signing in only adds ' +
         'memory across devices.</p>';
@@ -579,6 +604,7 @@
         write("gradeBands", bands); bandsAsked = true; write("gradeAsked", true);
         sheetOpen = false; render(); emit(); return;
       }
+      if (act.dataset.act === "google") { TeacherPlate.signInWithGoogle(); return; }
       if (act.dataset.act === "sendlink") {
         var f = root.querySelector("#tp-email");
         TeacherPlate.sendLink(f ? f.value.trim() : "").catch(function () {});
@@ -676,6 +702,16 @@
       sheetMode = "signin"; authNote = null; sheetOpen = true; sheetState = "idle"; render();
       var el = root.getElementById ? null : root.querySelector("#tp-email");
       if (el) el.focus();
+    },
+    signInWithGoogle: function () {
+      var c = cfg();
+      if (!c) { console.warn("[TeacherPlate] accounts are not configured yet"); return; }
+      var back = location.pathname + location.search;
+      var to = location.origin + "/app.html?from=" + encodeURIComponent(back);
+      // Tokens come back in the URL fragment and are consumed by consumeRedirect(),
+      // exactly as with magic link — only the way in differs.
+      location.href = c.supabaseUrl + "/auth/v1/authorize?provider=google&redirect_to=" +
+                      encodeURIComponent(to);
     },
     sendLink: function (email) {
       var c = cfg();
