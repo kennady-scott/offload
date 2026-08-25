@@ -671,7 +671,9 @@
       handlers = handlers.filter(function (h) { return h !== fn; }); }; },
     signIn: function () {
       if (!cfg()) { console.warn("[TeacherPlate] accounts are not configured yet"); return; }
-      authNote = null; sheetOpen = true; sheetState = "idle"; render();
+      // sheetMode is shared with the grades prompt — reset it, or opening that one
+      // first makes the Sign in button keep reopening it.
+      sheetMode = "signin"; authNote = null; sheetOpen = true; sheetState = "idle"; render();
       var el = root.getElementById ? null : root.querySelector("#tp-email");
       if (el) el.focus();
     },
