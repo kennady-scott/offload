@@ -279,6 +279,7 @@ const DECKS = [
   subtitle: "A tiny mystery students crack using three clues. Reveal one at a time.",
   minutes: 5, grades: ["35","68"], subjects: ["ela"], energy: "low", group: "whole",
   situations: ["thinking","too-much","switching","finished-early"],
+  art: "img/micro-mystery.webp",
   featured: true,
   prompts: [
     { stem: "Micro Mystery", big: "A woman pushes her car up to a hotel and immediately knows she is bankrupt. Why?",
@@ -314,6 +315,7 @@ const DECKS = [
   subtitle: "Same three-clue structure. The solution is a science concept.",
   minutes: 5, grades: ["35","68"], subjects: ["science"], energy: "low", group: "whole",
   situations: ["review","thinking","too-much"],
+  art: "img/micro-mystery-science.webp",
   prompts: [
     { stem: "Micro Mystery", big: "A puddle in the parking lot disappears overnight. It did not rain, and nothing drank it.",
       clues: ["The pavement was warm all evening.","There was a breeze.","The air felt slightly more humid in the morning."],
@@ -344,6 +346,7 @@ const DECKS = [
   subtitle: "Three random objects. One minute. All three have to be in it.",
   minutes: 5, grades: ["k2","35","68"], subjects: ["ela"], energy: "medium", group: "solo",
   situations: ["thinking","too-much","finished-early","switching"],
+  art: "img/sixty-second-story.webp",
   prompts: [
     { stem: "All three. Sixty seconds.", items: [ {label:"A key",icon:"🔑"}, {label:"A goat",icon:"🐐"}, {label:"A thunderstorm",icon:"⛈️"} ] },
     { stem: "All three. Sixty seconds.", items: [ {label:"A broken clock",icon:"🕰️"}, {label:"A red balloon",icon:"🎈"}, {label:"A librarian",icon:"📚"} ] },
@@ -525,6 +528,7 @@ const DECKS = [
   subtitle: "K-2 science sorting. Living, not living, and everything in between.",
   minutes: 2, grades: ["k2"], subjects: ["science"], energy: "low", group: "whole",
   situations: ["review","thinking","switching","too-much"],
+  art: "img/odd-one-out-k2-nature.webp",
   prompts: [
     { stem: "Which one doesn't belong?", items: [ {label:"Fish",icon:"🐟"}, {label:"Duck",icon:"🦆"}, {label:"Frog",icon:"🐸"}, {label:"Cat",icon:"🐈"} ], note: "The cat is the only one that doesn't swim · the fish is the only one that can't leave the water." },
     { stem: "Which one doesn't belong?", items: [ {label:"Tree",icon:"🌳"}, {label:"Rock",icon:"🪨"}, {label:"Flower",icon:"🌸"}, {label:"Grass",icon:"🌱"} ], note: "The rock is not living · the tree is the tallest · the flower is the only one with petals." },
