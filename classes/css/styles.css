@@ -1,0 +1,98 @@
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--cream);
+     color:var(--ink);-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+.tool-head{border-bottom:1.5px solid var(--line);background:#fff}
+.tool-head .wrap{display:flex;align-items:center;gap:14px;padding:20px 24px}
+.badge{width:46px;height:46px;flex:none;display:grid;place-items:center;font-size:22px;
+       background:var(--mint);border-radius:58% 42% 47% 53% / 45% 55% 45% 55%;transform:rotate(-6deg)}
+.tool-head h1{font-family:"Playfair Display",serif;font-weight:900;font-size:29px;letter-spacing:-.025em;margin:0;line-height:1.05}
+.tool-head p{margin:3px 0 0;font-size:14.5px;color:var(--ink-3)}
+.no-acct{margin-left:auto;font-size:12px;font-weight:600;color:var(--ink-3);
+         border:1.5px solid var(--line);border-radius:999px;padding:6px 13px;white-space:nowrap}
+
+/* empty state */
+.empty{text-align:center;padding:64px 20px 80px;max-width:560px;margin:0 auto}
+.empty .e{font-size:44px;display:block;margin-bottom:14px}
+.empty h2{font-family:"Playfair Display",serif;font-weight:800;font-size:31px;letter-spacing:-.026em;margin:0 0 10px}
+.empty p{color:var(--ink-2);margin:0 0 24px;font-size:16px}
+.empty .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* layout */
+.cols{display:grid;grid-template-columns:288px minmax(0,1fr);gap:20px;padding:26px 0 50px;align-items:start}
+.side{display:flex;flex-direction:column;gap:9px;position:sticky;top:14px}
+.klist{display:flex;flex-direction:column;gap:8px}
+.kbtn{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);
+      border-radius:13px;padding:11px 13px;text-align:left;width:100%;transition:.15s}
+.kbtn:hover{border-color:rgba(20,33,61,.28)}
+.kbtn.on{border-color:var(--ink);box-shadow:0 0 0 1.5px var(--ink)}
+.kbtn .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.kbtn .t{min-width:0;flex:1}
+.kbtn .t b{display:block;font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kbtn .t span{font-size:12px;color:var(--ink-3)}
+
+.panel{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:20px 22px}
+.panel + .panel{margin-top:14px}
+.panel h3{margin:0 0 3px;font-size:16.5px;font-weight:700}
+.panel p.hint{margin:0 0 16px;font-size:13.5px;color:var(--ink-3)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.f{display:flex;flex-direction:column;gap:5px}
+.f.wide{grid-column:1/-1}
+.f label{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.f input,.f textarea{font:inherit;font-size:14.5px;padding:9px 11px;border:1.5px solid var(--line);
+     border-radius:9px;background:#FCFCFD;color:var(--ink);width:100%}
+.f textarea{min-height:58px;resize:vertical;line-height:1.5}
+.f input:focus,.f textarea:focus{outline:none;border-color:var(--blue);background:#fff}
+.swatches{display:flex;gap:7px;flex-wrap:wrap}
+.swatches button{width:26px;height:26px;border-radius:50%;border:2px solid transparent}
+.swatches button.on{border-color:var(--ink);box-shadow:0 0 0 2px #fff inset}
+
+/* roster */
+.stu{border-top:1px solid var(--line-2);padding:13px 0}
+.stu:first-of-type{border-top:0}
+.stuhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.stuhead input.fn{font:inherit;font-size:14.5px;font-weight:600;padding:7px 10px;border:1.5px solid var(--line);
+     border-radius:8px;background:#FCFCFD;width:150px}
+.stuhead input.li{width:52px;text-align:center;font:inherit;font-size:14.5px;font-weight:600;padding:7px 6px;
+     border:1.5px solid var(--line);border-radius:8px;background:#FCFCFD}
+.stuhead input:focus{outline:none;border-color:var(--blue);background:#fff}
+.stuhead .del{margin-left:auto;font-size:12.5px;color:var(--ink-3);border:1.5px solid var(--line);
+     border-radius:8px;padding:6px 10px}
+.stuhead .del:hover{border-color:var(--pink);color:#C23A5E}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.chip{font-size:12px;font-weight:600;border:1.5px solid var(--line);border-radius:999px;padding:5px 11px;color:var(--ink-3)}
+.chip:hover{border-color:rgba(20,33,61,.3);color:var(--ink-2)}
+.chip.on{background:var(--mint);border-color:rgba(46,122,82,.35);color:#256B45}
+.stunote{margin-top:9px}
+.stunote input{font:inherit;font-size:13.5px;padding:8px 10px;border:1.5px solid var(--line);
+     border-radius:8px;background:#FCFCFD;width:100%}
+.stunote input:focus{outline:none;border-color:var(--blue);background:#fff}
+
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:14.5px;font-weight:600;
+     border:1.5px solid var(--line);border-radius:10px;padding:10px 16px;background:#fff}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.primary:hover{background:#1B2C50}
+.btn.danger:hover{border-color:var(--pink);color:#C23A5E}
+.btn.sm{font-size:13px;padding:8px 13px}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.rowacts{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.priv{display:flex;gap:9px;align-items:flex-start;background:#F4F8FF;border:1.5px solid rgba(53,103,232,.22);
+      border-radius:11px;padding:11px 13px;font-size:13px;color:#254C9E;margin-top:14px;line-height:1.5}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;
+       font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:11px;z-index:60}
+.tool-foot{border-top:1.5px solid var(--line);background:#fff}
+.tool-foot .wrap{display:flex;align-items:center;gap:18px;padding:20px 24px 26px;font-size:13.5px;color:var(--ink-3);flex-wrap:wrap}
+.tool-foot a{font-weight:600;color:var(--ink-2)}
+.tool-foot a:hover{color:var(--blue)}
+
+@media (max-width:860px){
+  .cols{grid-template-columns:1fr}
+  .side{position:static}
+  .grid2{grid-template-columns:1fr}
+}

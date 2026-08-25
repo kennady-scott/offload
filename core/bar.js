@@ -22,14 +22,36 @@
   var NS   = "tp.v1.";
 
   /* ── state ───────────────────────────────────────────────────────────── */
-  // Seed data. Replaced by the Supabase `classes` read once auth lands;
-  // the shape here is the contract the rest of the bar depends on.
-  var CLASSES = [
-    { id: "p1",  period: "Period 1",  name: "8th Grade ELA",  students: 24, color: "#3E9A6A" },
-    { id: "p3",  period: "Period 3",  name: "8th Grade ELA",  students: 24, color: "#E8763A" },
-    { id: "p5",  period: "Period 5",  name: "Intervention",   students: 12, color: "#7B5BD6" },
-    { id: "adv", period: "Advisory",  name: "Homeroom",       students: 18, color: "#3567E8" }
+  /* The class store lives here on purpose. Tool pages get one script tag, and
+     there is exactly one definition of what a class is. Local for now; this is
+     the seam Supabase slots into without any tool changing. */
+  var C_KEY = "tp.v1.classes";
+
+  /* Instructional supports only. Never a diagnosis, never a label, never
+     medical data — design around what the learner needs. */
+  var SUPPORTS = [
+    { id: "chunk",     label: "Chunk longer directions" },
+    { id: "both",      label: "Written + verbal directions" },
+    { id: "time",      label: "Extra processing time" },
+    { id: "starters",  label: "Sentence starters help" },
+    { id: "checkin",   label: "Check in early on tasks" },
+    { id: "seat",      label: "Seat with fewer distractions" },
+    { id: "less",      label: "Reduce the amount, not the difficulty" },
+    { id: "aloud",     label: "Read prompts aloud" },
+    { id: "move",      label: "Needs movement breaks" },
+    { id: "preview",   label: "Preview vocabulary first" }
   ];
+
+  var COLORS = ["#3E9A6A", "#E8763A", "#7B5BD6", "#3567E8", "#C4407F", "#2E8B96", "#B8862B", "#5B6BD6"];
+
+  var EXAMPLES = [
+    { period: "Period 1", name: "8th Grade ELA", grade: "8", time: "8:30–9:20",  unit: "Character & dialogue", color: "#3E9A6A" },
+    { period: "Period 3", name: "8th Grade ELA", grade: "8", time: "10:05–10:55", unit: "Character & dialogue", color: "#E8763A" },
+    { period: "Period 5", name: "Intervention",  grade: "8", time: "1:10–2:00",   unit: "Fluency & comprehension", color: "#7B5BD6" },
+    { period: "Advisory", name: "Homeroom",      grade: "8", time: "2:05–2:25",   unit: "SEL check-ins", color: "#3567E8" }
+  ];
+
+  var CLASSES = [];
 
   function read(k, fallback) {
     try { var v = localStorage.getItem(NS + k); return v === null ? fallback : JSON.parse(v); }
@@ -39,9 +61,26 @@
     try { localStorage.setItem(NS + k, JSON.stringify(v)); } catch (e) {}
   }
 
+  function uid() {
+    return "c" + Math.abs(Date.now() % 1e8).toString(36) + Math.abs((CLASSES.length + 1) * 7919).toString(36);
+  }
+  function loadClasses() {
+    var raw = read("classes", null);
+    CLASSES = (raw && raw.classes) ? raw.classes : [];
+    CLASSES.forEach(function (k) { if (!k.students) k.students = []; });
+    return CLASSES;
+  }
+  function saveClasses() {
+    write("classes", { version: 1, classes: CLASSES });
+    if (classId && !CLASSES.some(function (k) { return k.id === classId; })) {
+      classId = null; write("classId", null);         // selected class was deleted
+    }
+  }
+
   var user     = read("user", null);          // null = anonymous, the normal case
   var classId  = read("classId", null);
   var handlers = [];
+  loadClasses();
 
   function currentClass() {
     for (var i = 0; i < CLASSES.length; i++) if (CLASSES[i].id === classId) return CLASSES[i];
@@ -142,22 +181,31 @@
 
   function classChipInner() {
     var k = currentClass();
+    if (!CLASSES.length) return '<span class="swatch"></span><span class="label">Add your classes</span>' + CARET;
     if (!k) return '<span class="swatch"></span><span class="label">Choose a class</span>' + CARET;
     return '<span class="swatch" style="background:' + k.color + '"></span>' +
            '<span class="label">' + k.period + ' <span class="sub">· ' + k.name + '</span></span>' + CARET;
   }
 
   function classMenuInner() {
+    if (!CLASSES.length) {
+      return '<div class="mhead">Your classes</div>' +
+        '<div style="padding:4px 10px 10px;font-size:12.5px;color:var(--ob-ink3);line-height:1.5">' +
+        'Nothing here yet. Set them up once and every tool knows your periods, ' +
+        'your students, and your routines.</div>' +
+        '<a class="item" href="/classes/"><span class="t"><b>Add your classes</b></span></a>';
+    }
     var out = '<div class="mhead">Your classes</div>';
     CLASSES.forEach(function (k) {
       out += '<button class="item" role="menuitemradio" data-pick="' + k.id + '" ' +
              'aria-checked="' + (k.id === classId) + '">' +
              '<span class="swatch" style="background:' + k.color + '"></span>' +
-             '<span class="t"><b>' + k.period + ' · ' + k.name + '</b><span>' + k.students +
-             ' students</span></span>' + TICK + '</button>';
+             '<span class="t"><b>' + k.period + ' · ' + k.name + '</b><span>' +
+             ((k.students || []).length) + (((k.students || []).length) === 1 ? ' student' : ' students') +
+             (k.unit ? ' · ' + k.unit : '') + '</span></span>' + TICK + '</button>';
     });
     out += '<div class="sep"></div>' +
-           '<a class="item" href="' + HUB + '"><span class="t"><b>Manage classes</b></span></a>';
+           '<a class="item" href="/classes/"><span class="t"><b>Manage classes</b></span></a>';
     return out;
   }
 
@@ -241,6 +289,59 @@
     classes:      function () { return CLASSES.slice(); },
     currentClass: currentClass,
     setClass: function (id) { classId = id; write("classId", id); render(); emit(); },
+
+    /* ── class + roster CRUD ── */
+    SUPPORTS: SUPPORTS,
+    COLORS: COLORS,
+    isEmpty: function () { return CLASSES.length === 0; },
+    addClass: function (p) {
+      var k = {
+        id: uid(), period: (p && p.period) || "New class", name: (p && p.name) || "",
+        grade: (p && p.grade) || "", time: (p && p.time) || "", unit: (p && p.unit) || "",
+        notes: (p && p.notes) || "", color: (p && p.color) || COLORS[CLASSES.length % COLORS.length],
+        students: []
+      };
+      CLASSES.push(k); saveClasses(); render(); emit(); return k;
+    },
+    updateClass: function (id, patch) {
+      var k = CLASSES.filter(function (c) { return c.id === id; })[0];
+      if (!k) return null;
+      Object.keys(patch || {}).forEach(function (key) { k[key] = patch[key]; });
+      saveClasses(); render(); emit(); return k;
+    },
+    removeClass: function (id) {
+      CLASSES = CLASSES.filter(function (c) { return c.id !== id; });
+      saveClasses(); render(); emit();
+    },
+    addStudent: function (cid, st) {
+      var k = CLASSES.filter(function (c) { return c.id === cid; })[0];
+      if (!k) return null;
+      var s2 = { id: "s" + Date.now().toString(36) + k.students.length,
+                 first: (st && st.first) || "", last: (st && st.last) || "",
+                 supports: [], note: "" };
+      k.students.push(s2); saveClasses(); render(); emit(); return s2;
+    },
+    updateStudent: function (cid, sid, patch) {
+      var k = CLASSES.filter(function (c) { return c.id === cid; })[0];
+      if (!k) return null;
+      var s2 = k.students.filter(function (x) { return x.id === sid; })[0];
+      if (!s2) return null;
+      Object.keys(patch || {}).forEach(function (key) { s2[key] = patch[key]; });
+      saveClasses(); emit(); return s2;
+    },
+    removeStudent: function (cid, sid) {
+      var k = CLASSES.filter(function (c) { return c.id === cid; })[0];
+      if (!k) return;
+      k.students = k.students.filter(function (x) { return x.id !== sid; });
+      saveClasses(); emit();
+    },
+    loadExamples: function () {
+      EXAMPLES.forEach(function (e) {
+        CLASSES.push({ id: uid() + Math.random().toString(36).slice(2, 5), period: e.period, name: e.name,
+                       grade: e.grade, time: e.time, unit: e.unit, notes: "", color: e.color, students: [] });
+      });
+      saveClasses(); render(); emit();
+    },
     onChange: function (fn) { handlers.push(fn); return function () {
       handlers = handlers.filter(function (h) { return h !== fn; }); }; },
     // Stubs until Supabase auth lands. Same signatures, so tools need no changes.

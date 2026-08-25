@@ -76,8 +76,12 @@ const cat  = k => CATEGORIES[k];
 const catVar = k => "--c-" + cat(k).short.toLowerCase();
 const gradeLabel = k => (GRADES.find(g => g.key === k) || {}).label || k;
 const gradesText = arr => {
-  const o = ["k2","35","68"].filter(g => arr.includes(g));
-  return o.length === 3 ? "K–8" : o.map(gradeLabel).join(", ");
+  const o = ["k2","35","68","912"].filter(g => arr.includes(g));
+  if (o.length === 4) return "K–12";
+  if (o.length === 3 && o[0] === "k2") return "K–8";          // k2+35+68
+  if (o.length === 3 && o[0] === "35") return "3–12";         // 35+68+912
+  if (o.length === 2 && o[0] === "68") return "6–12";         // 68+912
+  return o.map(gradeLabel).join(", ");
 };
 const noiseLabel  = { silent:"Silent", quiet:"Quiet", lively:"Lively" };
 const formatLabel = { whole:"Whole class", pairs:"Pairs", solo:"Independent", small:"Small groups" };
@@ -386,7 +390,7 @@ function viewHome() {
         <h2>${svg("sparkle",20)} I’ve Got 5 Minutes</h2>
         <p class="finder-sub">Tell me what you need. I’ll do the rest.</p>
         <div class="field-label">Grade</div>
-        <div class="chips chips-grade" data-group="grade">
+        <div class="chips chips-grade chips-4" data-group="grade">
           ${GRADES.map(g => `<button class="chip" data-val="${g.key}">${g.label}</button>`).join("")}
         </div>
         <div class="field-label">Time</div>
@@ -501,7 +505,7 @@ function viewHome() {
           </a>`;
         }).join("")}
       </div>
-      <p class="grade-note">9–12 isn’t built yet. It needs its own writing pass, not a relabelled middle-school list.</p>
+      <p class="grade-note">Every band is written for that band. 9–12 is not a relabelled middle-school list.</p>
     </div>
   </section>
 
@@ -812,7 +816,7 @@ function openFinder() {
         <h1>What are we working with?</h1>
         <div class="ff-block">
           <div class="field-label">Grade</div>
-          <div class="chips chips-grade" data-group="grade">
+          <div class="chips chips-grade chips-4" data-group="grade">
             ${GRADES.map(g => `<button class="chip ${finderState.grade === g.key ? "is-on" : ""}" data-val="${g.key}">${g.label}</button>`).join("")}
           </div>
         </div>

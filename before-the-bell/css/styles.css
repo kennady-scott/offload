@@ -723,3 +723,9 @@ p{margin:0}
 .chips-4 .chip{padding:9px 6px;font-size:.82rem}
 .lib-emo{margin-right:2px}
 .tile b{margin-top:2px}
+
+/* 9–12 added: four grade bands */
+.grades-row{grid-template-columns:repeat(4,1fr)}
+@media (max-width:1000px){ .grades-row{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:720px){ .grades-row{grid-template-columns:1fr} }
+.grade-card em{font-size:.72rem}

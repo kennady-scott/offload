@@ -16,6 +16,7 @@ let profile = store.read(P_KEY, {});
 let state = Object.assign({ step: "energy", energy: null, when: "", classes: {} }, store.read(S_KEY, {}));
 const save = () => store.write(S_KEY, state);
 
+const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
 const esc = t => String(t == null ? "" : t).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
 let tTimer;
 function toast(m) { toastEl.textContent = m; toastEl.hidden = false; clearTimeout(tTimer); tTimer = setTimeout(()=>toastEl.hidden = true, 1900); }
@@ -78,7 +79,7 @@ function stepClasses() {
         return '<div class="rowclass">' +
           '<label class="tick"><input type="checkbox" data-on="' + k.id + '"' + (on ? " checked" : "") + '></label>' +
           '<span class="swatch" style="background:' + k.color + '"></span>' +
-          '<span class="nm">' + esc(k.period) + '<small>' + esc(k.name) + ' &middot; ' + k.students + ' students</small></span>' +
+          '<span class="nm">' + esc(k.period) + '<small>' + esc(k.name) + ' &middot; ' + (k.students||[]).length + ' students</small></span>' +
           '<input data-time="' + k.id + '" placeholder="8:30–9:20" value="' + esc(c.time || "") + '" style="max-width:130px">' +
           (needsInput ? '<input data-note="' + k.id + '" placeholder="' + esc(ph) + '" value="' + esc(c.note || "") + '">' : "") +
         '</div>';
@@ -157,7 +158,7 @@ function stepPlan() {
           '<div class="per">' +
             '<div class="pt"><b>' + esc(p.k.period) + ' &mdash; ' + esc(p.k.name) + '</b>' +
               (p.c.time ? '<span class="when">' + esc(p.c.time) + '</span>' : '') +
-              '<span class="when">' + p.k.students + ' students</span>' +
+              '<span class="when">' + plural((p.k.students||[]).length, 'student') + '</span>' +
               (p.own ? '<span class="tag">teacher&rsquo;s plan</span>' : '<span class="tag">no-prep</span>') +
             '</div>' +
             (p.own
