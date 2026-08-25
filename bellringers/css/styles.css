@@ -647,7 +647,9 @@ h1,h2,h3,h4{ font-family:var(--display); margin:0; letter-spacing:-.02em; }
 
 /* ═══════════════════ RESPONSIVE ═══════════════════ */
 @media (max-width:1180px){
-  .home{ grid-template-columns:1fr; }
+  /* minmax(0,…) not 1fr: a bare 1fr floors at min-content, so the situation
+     buttons held .home-left open to 1398px and the whole page scrolled sideways. */
+  .home{ grid-template-columns:minmax(0,1fr); }
   .home-left{ border-right:0; min-height:0; }
   .home-right{ padding:0 32px 60px; max-width:640px; }
   .value-strip{ grid-template-columns:repeat(2,1fr); }
