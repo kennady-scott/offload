@@ -1,7 +1,19 @@
-# Accounts — setup runbook
+# Accounts — BUILT, AND DELIBERATELY SWITCHED OFF
 
-Everything is built and deployed. It is **dormant until `core/config.js` has real values**, and
-that dormant state is the normal working product: local storage, no sign-in button, nothing broken.
+**Decided 2026-08-25: Teacher Plate is free with no login.** Every tool works, everything saves
+to the teacher's own browser, and no sign-in is offered — offering one that isn't needed is worse
+than not offering it.
+
+Nothing was deleted. The whole layer is built and tested: schema, RLS, grants, session handling,
+token refresh, magic-link sign-in, and whole-collection sync.
+
+## To turn it back on
+1. Paste this back into `core/config.js` as `supabaseAnonKey`, and bump `config.js?v=`:
+   `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94Z21zY2VqZHV2cGxnYXBvYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2ODg4NDQsImV4cCI6MjEwMzI2NDg0NH0.OC2FXB6heaGHMd-Jrd7Psf8ty5wCbD8x59GQkTLuRrg`
+   (Public by design — it ships in every browser. RLS plus the grants are the boundary.)
+2. Pick a sign-in method. **Google is the better first choice** and needs no email at all; magic
+   link needs custom SMTP because Supabase's built-in mail is ~2/hour and lands in spam.
+3. Delete the two leftover test users: `tp-rls-a@` and `tp-rls-b@teacherplate.com`.
 
 ## What only you can do
 
