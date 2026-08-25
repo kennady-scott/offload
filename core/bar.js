@@ -503,8 +503,8 @@
         '<div class="row"><button class="cancel" data-act="closesheet" style="flex:1">Done</button></div>';
     } else {
       body = '<h3>Sign in to Teacher Plate</h3>' +
-        '<p>Your classes and students follow you from school to home, and can&rsquo;t be lost by ' +
-        'clearing your browser. No password to remember.</p>' +
+        '<p>Free, and optional. Your classes, grades and saved work follow you from school ' +
+        'to home instead of living in one browser. No password to remember.</p>' +
         '<input id="tp-email" type="email" placeholder="you@school.org" autocomplete="email" ' +
           (sheetState === "sending" ? "disabled" : "") + '>' +
         (authNote ? '<p class="msg bad">' + authNote + '</p>' : '') +

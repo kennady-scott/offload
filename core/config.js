@@ -5,17 +5,14 @@
    The anon key is PUBLIC by design — it ships in every browser. RLS in
    supabase/schema.sql is what actually protects a teacher's roster. Never put a
    service_role key here. */
-/* ACCOUNTS ARE DELIBERATELY OFF (decided 2026-08-25).
-   Teacher Plate is free with no login: every tool works, everything saves to the
-   teacher's own browser, and no sign-in is offered because none is needed.
-
-   The whole account layer is built and tested — schema, session, sync, sign-in.
-   To switch it back on, paste the anon key from AUTH.md back into supabaseAnonKey
-   and bump the ?v= on config.js. cfg() requires BOTH values, so a blank key keeps
-   it dormant without deleting anything. */
+/* Accounts are ON, and FREE — there is no paid tier and no paywall anywhere.
+   Signing in is optional: every tool works fully without it. What an account adds
+   is durability — your classes, grade bands and saved work follow you to another
+   device and survive clearing your browser. Anonymous use keeps all of that too,
+   just only in this browser. */
 window.TP_CONFIG = {
   supabaseUrl: "https://oxgmscejduvplgapoaib.supabase.co",
-  supabaseAnonKey: "", // eyJ... (anon / publishable key, never service_role)
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94Z21zY2VqZHV2cGxnYXBvYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2ODg4NDQsImV4cCI6MjEwMzI2NDg0NH0.OC2FXB6heaGHMd-Jrd7Psf8ty5wCbD8x59GQkTLuRrg", // eyJ... (anon / publishable key, never service_role)
 
   // "magiclink" needs no external setup. "google" needs a Google Cloud OAuth
   // client configured in Supabase. Both can be on at once.
