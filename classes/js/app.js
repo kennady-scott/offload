@@ -92,6 +92,11 @@ function renderApp() {
           '<div class="rowacts">' +
             '<button class="btn sm" data-addstu><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add a student</button>' +
           '</div>' +
+          '<div class="rowacts" style="margin-top:18px;border-top:1px solid var(--line-2);padding-top:16px">' +
+            '<button class="btn sm" data-export>Download a backup</button>' +
+            '<button class="btn sm" data-import>Restore from a file</button>' +
+            '<input type="file" id="impFile" accept="application/json" hidden>' +
+          '</div>' +
           '<div class="priv"><span>🔒</span><span>Stays in this browser. Keep it to what helps you teach ' +
           '&mdash; supports, not diagnoses. No medical information, no labels, no IEP details.</span></div>' +
         '</div>' +
@@ -109,8 +114,24 @@ function fldArea(key, label, val, ph) {
 }
 
 /* ── events ─────────────────────────────────────────────────────── */
+function stamp() {
+  const d = new Date(), p = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+
 document.addEventListener("click", e => {
   const t = e.target;
+
+  if (t.closest("[data-export]")) {
+    const blob = new Blob([JSON.stringify({ version: 1, exported: stamp(), classes: TP().classes() }, null, 2)],
+                          { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "teacher-plate-classes-" + stamp() + ".json";
+    a.click(); URL.revokeObjectURL(a.href);
+    toast("Backup downloaded"); return;
+  }
+  if (t.closest("[data-import]")) { document.getElementById("impFile").click(); return; }
 
   if (t.closest("[data-examples]")) { TP().loadExamples(); toast("Example classes added"); return renderApp(); }
   if (t.closest("[data-add]")) {
@@ -175,6 +196,34 @@ document.addEventListener("input", e => {
     if (t.dataset.k === "last") t.value = patch.last;
     TP().updateStudent(selected, t.dataset.st, patch);
   }
+});
+
+document.addEventListener("change", e => {
+  if (e.target.id !== "impFile" || !e.target.files || !e.target.files[0]) return;
+  const f = e.target.files[0];
+  const rd = new FileReader();
+  rd.onload = () => {
+    let data;
+    try { data = JSON.parse(rd.result); } catch (err) { return toast("That file isn't a backup"); }
+    const incoming = (data && data.classes) || [];
+    if (!Array.isArray(incoming) || !incoming.length) return toast("No classes in that file");
+    // Additive by default: restoring must never silently wipe what is already here.
+    const have = {}; TP().classes().forEach(k => { have[k.period + "|" + k.name] = true; });
+    let added = 0;
+    incoming.forEach(k => {
+      if (have[k.period + "|" + k.name]) return;
+      const nk = TP().addClass({ period: k.period, name: k.name, grade: k.grade,
+                                 time: k.time, unit: k.unit, notes: k.notes, color: k.color });
+      (k.students || []).forEach(st => {
+        const ns = TP().addStudent(nk.id, { first: st.first, last: st.last });
+        TP().updateStudent(nk.id, ns.id, { supports: st.supports || [], note: st.note || "" });
+      });
+      added++;
+    });
+    toast(added ? "Restored " + added + " class" + (added === 1 ? "" : "es") : "Those classes are already here");
+    renderApp();
+  };
+  rd.readAsText(f);
 });
 
 function boot() {

@@ -27,19 +27,17 @@ The anon key is public by design; it ships in every browser and RLS is what prot
 **5. Bump the cache version**
 `core/config.js?v=` and `core/bar.js?v=` on every page, or returning teachers run the old file.
 
-## Decisions still open
+## Decided 2026-08-25
+- **Free tier** while testing. Free has **no backups** — see the export button below, and move to
+  Pro (~$25/mo) before any teacher stores a roster they'd be upset to lose.
+- **Magic link only.** Google sign-in comes later; add `"google"` to `authMethods` when a Google
+  Cloud OAuth client exists. Until then `plotruckus.com` needs its own emailed link.
+- Project account: hers, told to me after she creates it.
 
-**Email delivery.** Supabase's built-in SMTP is rate limited to a handful of messages an hour and
-is explicitly not for production. Magic links will work for you while testing and will fail for
-real teachers. Before launch, set custom SMTP (Resend's free tier is 3k/month) under
-Authentication → Emails → SMTP.
-
-**Google sign-in.** Better for teachers — they all have a school Google account, and it is the only
-thing that makes `plotruckus.com` a single click instead of a second email. Costs a Google Cloud
-OAuth client plus a consent screen. Add `"google"` to `authMethods` in config once it exists.
-
-**Free vs Pro.** Free has **no backups**. Do not let real teacher rosters live on it. Pro is ~$25/mo
-and is the floor cost of taking money at all.
+## Before real teachers, not before testing
+Supabase's built-in SMTP is rate limited to a handful of messages an hour and is explicitly not for
+production. Magic links will work for you and fail for users. Set custom SMTP (Resend free tier is
+3k/month) under Authentication → Emails → SMTP.
 
 ## What is unverified
 
@@ -49,6 +47,17 @@ most likely to need a small fix on first real run:
 1. **The magic-link call** — `POST /auth/v1/otp?redirect_to=…` with `{email, create_user}`.
 2. **The upsert** — `on_conflict=teacher_id,local_id` with `Prefer: resolution=merge-duplicates`.
 3. **The delete filter** — `?local_id=not.in.(a,b,c)` when ids contain unexpected characters.
+
+## First-run verification — three checks
+Once the keys are in, in this order:
+1. **Signed out, RLS holds.** In the SQL editor as `anon`: `select count(*) from public.classes;`
+   should return 0 rows, not an error and not somebody's data.
+2. **A link arrives and lands.** Sign in from `/classes/`; the email link should return you to
+   `/classes/` (via `/app.html?from=`) already signed in.
+3. **A round trip survives.** Add a class, hard-reload, confirm it is still there; then open a
+   private window, sign in again, and confirm the class appears with no local storage to help it.
+
+If any of the three fails, the likely culprits are the three unverified calls below.
 
 ## How it behaves
 
