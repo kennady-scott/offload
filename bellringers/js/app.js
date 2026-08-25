@@ -737,6 +737,7 @@ function route(){
   window.scrollTo(0, 0);
   paintFavCount();
   wireRail();
+  fitMiniatures();
 }
 
 function syncBuilderChips(){
@@ -745,6 +746,20 @@ function syncBuilderChips(){
   $$("[data-benergy]").forEach(b => b.classList.toggle("on", b.dataset.benergy === builderState.energy));
   $$("[data-bsubject]").forEach(b => b.classList.toggle("on", b.dataset.bsubject === builderState.subject));
   const inp = $("#minInput"); if (inp) inp.value = builderState.minutes;
+}
+
+/* A miniature must never crop, at any card width. Hand-tuned font sizes can't
+   guarantee that — the card is 214px at its narrowest and ~280px at its widest,
+   and prompt lengths vary — so measure and scale down whatever still overflows. */
+function fitMiniatures(){
+  $$(".card-live").forEach(box => {
+    const stage = box.querySelector(".stage");
+    if (!stage) return;
+    stage.style.transform = "";
+    const avail = box.clientHeight - 14;      /* .card-live vertical padding */
+    const need  = stage.scrollHeight;
+    if (need > avail && avail > 0) stage.style.transform = `scale(${(avail / need).toFixed(3)})`;
+  });
 }
 
 function wireRail(){
@@ -842,4 +857,9 @@ document.addEventListener("keydown", e => {
 });
 
 window.addEventListener("hashchange", route);
+
+let fitTimer;
+window.addEventListener("resize", () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitMiniatures, 120); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitMiniatures);
+
 route();
