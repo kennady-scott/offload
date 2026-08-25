@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Offload bar — harness</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0}
+  body{font-family:Inter,sans-serif;color:#14213D;background:#fff}
+  .page{max-width:760px;margin:0 auto;padding:40px 24px}
+  h1{font-size:26px;margin:0 0 6px}
+  p.sub{color:#7B87A0;margin:0 0 26px}
+  .card{border:1.5px solid rgba(20,33,61,.13);border-radius:14px;padding:18px;margin-bottom:14px}
+  code{background:rgba(20,33,61,.06);padding:2px 6px;border-radius:5px;font-size:12.5px}
+  pre{background:#F7F8FA;border:1.5px solid rgba(20,33,61,.1);border-radius:10px;padding:12px;
+      overflow-x:auto;font-size:12.5px;margin:0}
+  button.t{font:inherit;padding:8px 14px;border-radius:9px;border:1.5px solid rgba(20,33,61,.15);
+      background:#fff;cursor:pointer;font-weight:600;margin-right:8px}
+  button.t:hover{border-color:#14213D}
+  #log{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#3C4C6B;white-space:pre-wrap}
+</style>
+<script src="offload-bar.js" data-hub="../app.html"></script>
+</head>
+<body>
+<div class="page">
+  <h1>Mock tool page</h1>
+  <p class="sub">Stands in for Say This, Sub Day, Bellringers &mdash; anything the bar sits on top of.</p>
+
+  <div class="card">
+    <strong>Try it</strong>
+    <p>Switch class in the bar, then sign in and out. The tool below reacts through
+       <code>Offload.onChange()</code> &mdash; no page reload.</p>
+    <button class="t" onclick="Offload.signIn()">Sign in</button>
+    <button class="t" onclick="Offload.signOut()">Sign out</button>
+    <button class="t" onclick="Offload.setClass(null)">Clear class</button>
+  </div>
+
+  <div class="card">
+    <strong>What this tool sees</strong>
+    <pre id="log">waiting…</pre>
+  </div>
+
+  <div class="card">
+    <strong>Drop-in</strong>
+    <pre>&lt;script src="/offload-core/offload-bar.js" data-hub="/app.html"&gt;&lt;/script&gt;</pre>
+  </div>
+</div>
+
+<script>
+  Offload.onChange(function (s) {
+    document.getElementById('log').textContent = JSON.stringify({
+      user: s.user, currentClass: s.klass
+    }, null, 2);
+  });
+</script>
+</body>
+</html>
