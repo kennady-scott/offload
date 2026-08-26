@@ -86,8 +86,13 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
 @media (max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.links{display:none}}
 @media (max-width:660px){.grid{grid-template-columns:1fr}.wrap{padding:0 24px}.nav{padding:18px 24px 0}}
 
-.ticon{width:52px;height:52px;flex:none;display:block;object-fit:contain}
+.ticon{width:58px;height:58px;flex:none;display:block;object-fit:contain}
 .card.soon .ticon{opacity:.5}
+a.card:nth-child(3n+1) .ticon{transform:rotate(-7deg)}
+a.card:nth-child(3n+2) .ticon{transform:rotate(5deg)}
+a.card:nth-child(3n)   .ticon{transform:rotate(-3deg)}
+.ticon{transition:transform .18s cubic-bezier(.2,.7,.3,1)}
+a.card:hover .ticon{transform:rotate(0)}
 </style>
 </head>
 <body>
@@ -125,42 +130,42 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
     <div class="grid">
 
       <a class="card" href="/say-this/">
-        <img class="ticon" src="/img/icons/say-this.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/say-this.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Say This</h3><p class="thought">&ldquo;A kid is pushing back.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
 
       <a class="card" href="/get-them-back/">
-        <img class="ticon" src="/img/icons/get-them-back.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/get-them-back.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Get Them Back</h3><p class="thought">&ldquo;I am losing this class.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
 
       <a class="card" href="/bellringers/">
-        <img class="ticon" src="/img/icons/bellringers.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/bellringers.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Bellringers</h3><p class="thought">&ldquo;I need them working the second they sit down.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
 
       <a class="card" href="/before-the-bell/">
-        <img class="ticon" src="/img/icons/before-the-bell.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/before-the-bell.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Before the Bell</h3><p class="thought">&ldquo;We finished and there&rsquo;s five minutes left.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
 
       <a class="card" href="/home-note/">
-        <img class="ticon" src="/img/icons/home-note.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/home-note.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Home Note</h3><p class="thought">&ldquo;I need to contact home.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
 
       <a class="card" href="/sub-day/">
-        <img class="ticon" src="/img/icons/sub-day.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/sub-day.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Sub Day</h3><p class="thought">&ldquo;I can&rsquo;t come in tomorrow.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
@@ -179,28 +184,28 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
     <div class="grid">
 
       <a class="card" href="/adapt-it/">
-        <img class="ticon" src="/img/icons/adapt-it.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/adapt-it.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Adapt It</h3><p class="thought">&ldquo;This won&rsquo;t work for everyone.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
 
       <a class="card" href="/catch-me-up/">
-        <img class="ticon" src="/img/icons/catch-me-up.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/catch-me-up.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Catch Me Up</h3><p class="thought">&ldquo;They were absent. What do they need?&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
 
       <a class="card" href="/tiny-things/">
-        <img class="ticon" src="/img/icons/tiny-things.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/tiny-things.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Tiny Things</h3><p class="thought">&ldquo;I just need this annoying thing done.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
 
       <a class="card" href="https://plotruckus.com" target="_blank" rel="noopener">
-        <img class="ticon" src="/img/icons/plot-ruckus.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/plot-ruckus.png" alt="" width="160" height="160" decoding="async">
         <div class="body"><h3>Plot Ruckus</h3><p class="thought">&ldquo;Run a book club kids argue about.&rdquo;</p>
         <span class="status live"><i></i>ready now</span></div>
         <svg class="go ext" viewBox="0 0 22 16"><path d="M13.4 2.4h6v6"/><path d="M19.4 2.4 11.6 10.2"/><path d="M16.4 11.6v2.8a1 1 0 0 1-1 1H3.6a1 1 0 0 1-1-1V4.6a1 1 0 0 1 1-1h2.8"/></svg>

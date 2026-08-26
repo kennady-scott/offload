@@ -144,7 +144,13 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
   .trust-row{grid-template-columns:1fr}
 }
 
-.ticon{width:72px;height:72px;display:block;object-fit:contain;margin:0 auto 15px}
+.ticon{width:80px;height:80px;display:block;object-fit:contain;margin:0 auto 14px;
+       transition:transform .18s cubic-bezier(.2,.7,.3,1)}
+.tool:nth-child(4n+1) .ticon{transform:rotate(-7deg)}
+.tool:nth-child(4n+2) .ticon{transform:rotate(5deg)}
+.tool:nth-child(4n+3) .ticon{transform:rotate(-3deg)}
+.tool:nth-child(4n)   .ticon{transform:rotate(6deg)}
+.tool:hover .ticon{transform:rotate(0)}
 </style>
 </head>
 <body>
@@ -199,56 +205,56 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
     <div class="tools">
 
       <a class="tool" href="/say-this/">
-        <img class="ticon" src="/img/icons/say-this.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/say-this.png" alt="" width="160" height="160" decoding="async">
         <h3>Say This</h3>
         <p>What to say (and how to say it) in tough moments.</p>
         <svg class="go" viewBox="0 0 24 16"><path d="M1 8h20M16 3l5 5-5 5"/></svg>
       </a>
 
       <a class="tool" href="/adapt-it/">
-        <img class="ticon" src="/img/icons/adapt-it.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/adapt-it.png" alt="" width="160" height="160" decoding="async">
         <h3>Adapt It</h3>
         <p>Differentiate one assignment for every learner.</p>
         <svg class="go" viewBox="0 0 24 16"><path d="M1 8h20M16 3l5 5-5 5"/></svg>
       </a>
 
       <a class="tool" href="/catch-me-up/">
-        <img class="ticon" src="/img/icons/catch-me-up.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/catch-me-up.png" alt="" width="160" height="160" decoding="async">
         <h3>Catch Me Up</h3>
         <p>Create absent-student pages in seconds.</p>
         <svg class="go" viewBox="0 0 24 16"><path d="M1 8h20M16 3l5 5-5 5"/></svg>
       </a>
 
       <a class="tool" href="/home-note/">
-        <img class="ticon" src="/img/icons/home-note.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/home-note.png" alt="" width="160" height="160" decoding="async">
         <h3>Home Note</h3>
         <p>Emails and notes to parents&mdash;without overthinking it.</p>
         <svg class="go" viewBox="0 0 24 16"><path d="M1 8h20M16 3l5 5-5 5"/></svg>
       </a>
 
       <a class="tool" href="/get-them-back/">
-        <img class="ticon" src="/img/icons/get-them-back.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/get-them-back.png" alt="" width="160" height="160" decoding="async">
         <h3>Get Them Back</h3>
         <p>Quick moves for when engagement drops.</p>
         <svg class="go" viewBox="0 0 24 16"><path d="M1 8h20M16 3l5 5-5 5"/></svg>
       </a>
 
       <a class="tool" href="/sub-day/">
-        <img class="ticon" src="/img/icons/sub-day.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/sub-day.png" alt="" width="160" height="160" decoding="async">
         <h3>Sub Day</h3>
         <p>Build a sub plan that actually works.</p>
         <svg class="go" viewBox="0 0 24 16"><path d="M1 8h20M16 3l5 5-5 5"/></svg>
       </a>
 
       <a class="tool" href="/tiny-things/">
-        <img class="ticon" src="/img/icons/tiny-things.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/tiny-things.png" alt="" width="160" height="160" decoding="async">
         <h3>Tiny Things</h3>
         <p>All the little tasks that eat up your time.</p>
         <svg class="go" viewBox="0 0 24 16"><path d="M1 8h20M16 3l5 5-5 5"/></svg>
       </a>
 
       <a class="tool" href="/bellringers/">
-        <img class="ticon" src="/img/icons/bellringers.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/bellringers.png" alt="" width="160" height="160" decoding="async">
         <h3>Bellringers</h3>
         <p>Get them thinking the second class starts.</p>
         <svg class="go" viewBox="0 0 24 16"><path d="M1 8h20M16 3l5 5-5 5"/></svg>

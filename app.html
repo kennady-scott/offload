@@ -287,9 +287,18 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
   .hero{grid-template-columns:1fr}.hero-art{display:none}
 }
 
-.ticon{width:52px;height:52px;flex:none;display:block;object-fit:contain}
-.now .ticon{width:46px;height:46px;padding:3px;box-sizing:content-box;background:#fff;
-            border-radius:50%;box-shadow:0 1px 2px rgba(20,33,61,.07)}
+.ticon{width:58px;height:58px;flex:none;display:block;object-fit:contain}
+.now .ticon{width:62px;height:62px}
+/* D — free-standing, hand-placed tilt. No container: the drawings carry
+   themselves, and the alternating angle matches the taped notes and rotated
+   blobs elsewhere. Straightens on hover, which also signals the card is live. */
+.ticon{transition:transform .18s cubic-bezier(.2,.7,.3,1)}
+.now:nth-child(3n+1) .ticon,.tool:nth-child(4n+1) .ticon{transform:rotate(-7deg)}
+.now:nth-child(3n+2) .ticon,.tool:nth-child(4n+2) .ticon{transform:rotate(5deg)}
+.now:nth-child(3n)   .ticon,.tool:nth-child(4n+3) .ticon{transform:rotate(-3deg)}
+.tool:nth-child(4n)  .ticon{transform:rotate(6deg)}
+.now:hover .ticon,.tool:hover .ticon,a.card:hover .ticon{transform:rotate(0)}
+
 </style>
 </head>
 <body>
@@ -410,32 +419,32 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
     </div>
     <div class="now-grid">
       <a class="now n-blush" href="/say-this/">
-        <img class="ticon" src="/img/icons/say-this.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/say-this.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Say This</h3><p>&ldquo;A kid is pushing back.&rdquo;</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
       <a class="now n-yellow" href="/get-them-back/">
-        <img class="ticon" src="/img/icons/get-them-back.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/get-them-back.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Get Them Back</h3><p>&ldquo;I am losing this class.&rdquo;</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
       <a class="now n-lilac" href="/bellringers/">
-        <img class="ticon" src="/img/icons/bellringers.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/bellringers.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Bellringers</h3><p>&ldquo;I need them working the second they sit down.&rdquo;</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
       <a class="now n-mint" href="/before-the-bell/">
-        <img class="ticon" src="/img/icons/before-the-bell.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/before-the-bell.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Before the Bell</h3><p>&ldquo;We finished and there&rsquo;s five minutes left.&rdquo;</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
       <a class="now n-peach" href="/home-note/">
-        <img class="ticon" src="/img/icons/home-note.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/home-note.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Home Note</h3><p>&ldquo;I need to contact home.&rdquo;</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
       <a class="now n-sky" href="/sub-day/">
-        <img class="ticon" src="/img/icons/sub-day.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/sub-day.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Sub Day</h3><p>&ldquo;I can&rsquo;t come in tomorrow.&rdquo;</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
@@ -450,22 +459,22 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
     </div>
     <div class="tools">
       <a class="tool" href="/adapt-it/">
-        <img class="ticon" src="/img/icons/adapt-it.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/adapt-it.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Adapt It</h3><p>This assignment won&rsquo;t work for everyone.</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
       <a class="tool" href="/catch-me-up/">
-        <img class="ticon" src="/img/icons/catch-me-up.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/catch-me-up.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Catch Me Up</h3><p>They were absent. What do they need?</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
       <a class="tool" href="/tiny-things/">
-        <img class="ticon" src="/img/icons/tiny-things.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/tiny-things.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Tiny Things</h3><p>I just need this annoying thing done.</p></span>
         <svg class="go" viewBox="0 0 22 16"><path d="M1 8h18M14.6 3.4 20 8l-5.4 4.6"/></svg>
       </a>
       <a class="tool" href="https://plotruckus.com" target="_blank" rel="noopener">
-        <img class="ticon" src="/img/icons/plot-ruckus.png" alt="" width="144" height="144" decoding="async">
+        <img class="ticon" src="/img/art/plot-ruckus.png" alt="" width="160" height="160" decoding="async">
         <span><h3>Plot Ruckus</h3><p>Run a book club kids argue about.</p><span class="chip"><i></i>plotruckus.com</span></span>
         <svg class="go ext" viewBox="0 0 22 16"><path d="M13.4 2.4h6v6"/><path d="M19.4 2.4 11.6 10.2"/><path d="M16.4 11.6v2.8a1 1 0 0 1-1 1H3.6a1 1 0 0 1-1-1V4.6a1 1 0 0 1 1-1h2.8"/></svg>
       </a>
