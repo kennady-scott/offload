@@ -151,6 +151,24 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
 .tool:nth-child(4n+3) .ticon{transform:rotate(-3deg)}
 .tool:nth-child(4n)   .ticon{transform:rotate(6deg)}
 .tool:hover .ticon{transform:rotate(0)}
+
+/* how it works */
+.center-sub{text-align:center;color:var(--ink-3);margin:-18px auto 30px;max-width:56ch;font-size:16px;line-height:1.6}
+.how{background:var(--cream-deep);border-top:1.5px solid var(--line);border-bottom:1.5px solid var(--line)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.step{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-organic);padding:22px 22px 20px;
+      box-shadow:var(--shadow);position:relative}
+.step .num{position:absolute;top:-14px;left:20px;width:32px;height:32px;border-radius:50%;
+     background:var(--yellow);color:var(--ink);font-family:"Playfair Display",serif;font-weight:800;
+     font-size:17px;display:grid;place-items:center;box-shadow:0 2px 0 rgba(20,33,61,.14)}
+.step h3{margin:12px 0 7px;font-size:18px;font-weight:700;letter-spacing:-.015em}
+.step p{margin:0;font-size:14.5px;line-height:1.6;color:var(--ink-2)}
+/* what we store */
+.storegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.sbox{border:1.5px solid var(--line);border-radius:14px;padding:18px 19px;background:#fff}
+.sbox h3{margin:0 0 6px;font-size:15px;font-weight:700}
+.sbox p{margin:0;font-size:14px;line-height:1.6;color:var(--ink-2)}
+@media (max-width:900px){.steps,.storegrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -194,6 +212,36 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
     <div class="hero-art">
       <img src="img/hero-teacher.jpg" width="1096" height="950"
            alt="A teacher writing in a notebook at her desk beside a sticky note reading: Good teachers shouldn't have to do it all.">
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ HOW IT WORKS ══════════════ -->
+<section class="section how" id="how">
+  <div class="wrap">
+    <h2 class="center">You don&rsquo;t browse it. You use it.</h2>
+    <p class="center-sub">Most teacher sites hand you a library and wish you luck. This one asks
+      what&rsquo;s happening and answers.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="num">1</span>
+        <h3>Say what&rsquo;s going on</h3>
+        <p>Not a search box. Not a menu of features. &ldquo;A kid is pushing back.&rdquo;
+          &ldquo;I can&rsquo;t come in tomorrow.&rdquo; &ldquo;We finished and there&rsquo;s five
+          minutes left.&rdquo; Pick the one that&rsquo;s true right now.</p>
+      </div>
+      <div class="step">
+        <span class="num">2</span>
+        <h3>Get something you can use immediately</h3>
+        <p>Real words, real moves, in seconds &mdash; no waiting, no blank box asking you to write a
+          prompt. Every line was written and checked by a teacher, not produced on the spot.</p>
+      </div>
+      <div class="step">
+        <span class="num">3</span>
+        <h3>Set up your classes once</h3>
+        <p>Then every tool stops asking. Sub Day knows your periods. Home Note knows the student.
+          Adapt It knows what helps them. That part is optional, and it&rsquo;s free.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -269,6 +317,31 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
   </div>
 </section>
 
+<!-- ══════════════ WHAT WE STORE ══════════════ -->
+<section class="section store" id="privacy">
+  <div class="wrap">
+    <h2 class="center">What we store, in plain terms</h2>
+    <div class="storegrid">
+      <div class="sbox">
+        <h3>Without an account</h3>
+        <p>Everything stays in your own browser. Your classes, your grades, the things you&rsquo;ve
+          made. Nothing is sent anywhere, because there&rsquo;s nowhere for it to go.</p>
+      </div>
+      <div class="sbox">
+        <h3>With an account</h3>
+        <p>The same information, saved to your account so it follows you between computers. Only
+          you can read it. We don&rsquo;t sell it, share it, or use it to train anything.</p>
+      </div>
+      <div class="sbox">
+        <h3>About students</h3>
+        <p>First name and a last initial &mdash; that&rsquo;s all there&rsquo;s room for. Support
+          notes are instructional only: chunk directions, extra time, sentence starters. There is
+          deliberately nowhere to enter a diagnosis, an IEP, or medical information.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════════ TRUST ══════════════ -->
 <section class="trust">
   <div class="wrap">
@@ -301,7 +374,6 @@ footer{border-top:1.5px solid var(--line);padding:26px 0 34px}
       <a href="#how">How It Works</a>
       <a href="tools.html">Tools</a>
       <a href="#privacy">Privacy</a>
-      <a href="#contact">Contact</a>
     </nav>
   </div>
 </footer>
