@@ -761,6 +761,17 @@
     }
     if (cfg()) {
       consumeRedirect();
+      // The marketing page has no bar, so its CTA sends teachers here with
+      // ?signin=1 rather than making them find the button themselves.
+      try {
+        var q = new URLSearchParams(location.search);
+        if (q.get("signin") === "1" && !user) {
+          q.delete("signin");
+          var rest = q.toString();
+          history.replaceState(null, "", location.pathname + (rest ? "?" + rest : ""));
+          setTimeout(function () { TeacherPlate.signIn(); }, 250);
+        }
+      } catch (e) {}
       if (session) {
         pull().then(function (remote) {
           if (remote.length || !CLASSES.length) {
